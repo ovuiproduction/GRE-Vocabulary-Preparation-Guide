@@ -1,0 +1,238 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+@keyframes coverpage-fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+
+.coverpage-container {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    scroll-behavior: smooth;
+    opacity: 0;
+    animation: coverpage-fadeIn 0.5s ease-in forwards;
+  }
+  
+  .coverpage-hero-section {
+    background: linear-gradient(135deg, #1a237e 0%, #3f51b5 100%);
+    color: #ffffff;
+    padding: 6rem 2rem;
+    text-align: center;
+    clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .coverpage-title {
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .coverpage-cta-button {
+    background: #ffd700;
+    color: #1a237e;
+    padding: 1.2rem 2.5rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .coverpage-features-section {
+    padding: 8rem 2rem;
+    background: #ffffff;
+  }
+  
+  .coverpage-features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .coverpage-feature-card {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    transform: translateY(20px);
+    opacity: 1;
+  }
+  
+  
+  @media (max-width: 768px) {
+    .coverpage-title {
+      font-size: 2.5rem;
+    }
+    
+    .coverpage-features-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Features Title */
+.coverpage-features-title {
+  text-align: center;
+  font-size: 2.5rem;
+  color: #1a237e;
+  margin-bottom: 3rem;
+  font-weight: 700;
+  padding: 0 1rem;
+}
+
+/* Feature Icon Container */
+.coverpage-feature-icon-container {
+  width: 80px;
+  height: 80px;
+  background: rgba(26, 35, 126, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.coverpage-feature-icon {
+  font-size: 2rem;
+  color: #1a237e;
+  transition: all 0.3s ease;
+}
+
+/* Hover Effects */
+.coverpage-feature-card:hover .coverpage-feature-icon-container {
+  background: #1a237e;
+  transform: scale(1.1);
+}
+
+.coverpage-feature-card:hover .coverpage-feature-icon {
+  color: #ffffff;
+  transform: rotate(-15deg);
+}
+
+@media (max-width: 768px) {
+  .coverpage-features-title {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .coverpage-feature-icon-container {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .coverpage-feature-icon {
+    font-size: 1.5rem;
+  }
+}
+
+/* Feature Points */
+.coverpage-feature-points {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+}
+
+.coverpage-feature-point {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+  color: #444;
+}
+
+.coverpage-check-icon {
+  flex-shrink: 0;
+  color: #1a237e;
+  margin-right: 0.75rem;
+  margin-top: 0.25rem;
+  font-size: 1.1rem;
+}
+
+/* Hover Effects */
+.coverpage-feature-card:hover .coverpage-check-icon {
+  color: #3f51b5;
+  transform: scale(1.1);
+}
+
+.coverpage-feature-card:hover .coverpage-feature-point span {
+  color: #1a237e;
+}
+
+/* Mobile Optimization */
+@media (max-width: 768px) {
+  .coverpage-feature-points {
+    padding: 0 1rem;
+  }
+  
+  .coverpage-feature-point {
+    font-size: 0.9rem;
+  }
+  
+  .coverpage-check-icon {
+    font-size: 1rem;
+  }
+}
+
+/* In CoverPage.css */
+.coverpage-cta-button {
+  /* Existing styles */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+}
+
+.coverpage-cta-button:hover {
+  background: #ffffff;
+  color: #1a237e;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(26, 35, 126, 0.2);
+}
+
+.coverpage-cta-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.coverpage-cta-button:hover::before {
+  opacity: 1;
+}
+
+.coverpage-cta-arrow {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.coverpage-cta-button:hover .coverpage-cta-arrow {
+  transform: translateX(5px) rotate(-45deg);
+}
+
