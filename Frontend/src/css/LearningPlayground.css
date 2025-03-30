@@ -1,0 +1,364 @@
+:root {
+    --primary-blue: #0056d2;
+    --secondary-blue: #e9f0fd;
+    --text-dark: #2d2d2d;
+    --text-light: #5a5a5a;
+    --border-color: #e0e0e0;
+  }
+  
+  /* Main Container */
+  .learning-playground-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: #f7f9fc;
+  }
+  
+  /* Header Styles */
+  .learning-playground-header {
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    padding: 1rem 2rem;
+  }
+  
+  .learning-playground-header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .learning-playground-header-title {
+    font-size: 1.5rem;
+    color: var(--primary-blue);
+    margin: 0;
+  }
+  
+  .learning-playground-header-stats {
+    display: flex;
+    gap: 2rem;
+  }
+  
+  .learning-playground-stat-item {
+    text-align: right;
+  }
+  
+  .learning-playground-stat-label {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--text-light);
+  }
+  
+  .learning-playground-stat-value {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-dark);
+  }
+  
+  /* Main Content Area */
+  .learning-playground-main-content {
+    display: flex;
+    flex: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 2rem;
+    gap: 2rem;
+  }
+  
+  /* Sidebar Styles */
+  .learning-playground-sidebar {
+    width: 280px;
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    height:80vh;
+    box-sizing: border-box;
+    overflow-y: auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  
+  .learning-playground-sidebar-title {
+    font-size: 1.125rem;
+    color: var(--text-dark);
+    margin-bottom: 1.5rem;
+  }
+  
+  .learning-playground-days-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .learning-playground-day-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+  }
+  
+  .learning-playground-day-item:hover {
+    background: var(--secondary-blue);
+  }
+  
+  .learning-playground-day-item.active {
+    background: var(--primary-blue);
+    color: white;
+  }
+  
+  .learning-playground-day-number {
+    font-weight: 500;
+  }
+  
+  /* Content Area Styles */
+  .learning-playground-content {
+    flex: 1;
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  
+  .learning-playground-content-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .learning-playground-day-title {
+    font-size: 1.5rem;
+    color: var(--text-dark);
+    margin: 0 0 0.5rem;
+  }
+  
+  .learning-playground-word-count {
+    color: var(--text-light);
+    font-size: 0.875rem;
+  }
+  
+  .learning-playground-word-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .learning-playground-word-card {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 1.5rem;
+    transition: box-shadow 0.2s ease;
+  }
+  
+  .learning-playground-word-card:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  
+  .learning-playground-word-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .learning-playground-word-title {
+    font-size: 1.125rem;
+    color: var(--text-dark);
+    margin: 0;
+  }
+  
+  .learning-playground-learn-button {
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    padding: 0.5rem 1.25rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  
+  .learning-playground-learn-button:hover {
+    background: #0044ad;
+  }
+  
+  /* Modal Styles */
+  .learning-playground-word-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .learning-playground-modal-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+  }
+  
+  .learning-playground-modal-content {
+    position: relative;
+    background: white;
+    width: 600px;
+    max-height: 80vh;
+    padding: 2rem;
+    border-radius: 8px;
+    z-index: 1001;
+  }
+  
+  .learning-playground-modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-light);
+  }
+  
+  .learning-playground-modal-title {
+    font-size: 1.5rem;
+    color: var(--text-dark);
+    margin-bottom: 1.5rem;
+  }
+  
+  .learning-playground-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .learning-playground-definition-section h4,
+  .learning-playground-examples-section h4 {
+    font-size: 1.125rem;
+    color: var(--text-dark);
+    margin-bottom: 0.75rem;
+  }
+  
+  .learning-playground-examples-section ul {
+    padding-left: 1.5rem;
+    list-style-type: disc;
+    color: var(--text-light);
+  }
+  
+
+  /* LearningPlayground.css */
+:root {
+    --primary-color: #2d2d86;
+    --secondary-color: #4a4a9e;
+    --background-light: #f8f9fc;
+    --text-dark: #2d2d2d;
+    --text-light: #5a5a5a;
+    --border-color: #e0e0e0;
+    --success-color: #28a745;
+  }
+  
+  /* Modal Enhancements */
+  .learning-playground-word-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .learning-playground-modal-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+  }
+  
+  .learning-playground-modal-content {
+    position: relative;
+    background: white;
+    width: 700px;
+    max-height: 85vh;
+    padding: 2rem;
+    border-radius: 8px;
+    z-index: 1001;
+    overflow-y: auto;
+  }
+  
+  .learning-playground-modal-section {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: var(--background-light);
+    border-radius: 6px;
+  }
+  
+  .learning-playground-modal-section h4 {
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+  }
+  
+  .learning-playground-word-tier {
+    font-size: 0.9rem;
+    background: var(--secondary-color);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    margin-left: 1rem;
+  }
+  
+  .learning-playground-story-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-light);
+  }
+  
+  .learning-playground-mnemonic-media {
+    max-width: 90%;
+    margin-top: 1rem;
+    border-radius: 4px;
+  }
+  
+  .learning-playground-modal-actions {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    text-align: right;
+  }
+  
+  .learning-playground-complete-button {
+    background: var(--success-color);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s ease;
+  }
+  
+  .learning-playground-complete-button:hover {
+    background: #218838;
+  }
+  
+  .learning-playground-mnemonic {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+  }

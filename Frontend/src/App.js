@@ -8,7 +8,9 @@ import NotFound from './pages/NotFound';
 
 
 import StudyPlanForm from './pages/StudyPlanForm';
-import AddWordForm from './pages/AddWordForm';
+import AddWordForm from './pages/AddWordForm'; 
+
+import LearningPlayground from "./pages/LearningPlayGround";
 
 
 
@@ -24,6 +26,8 @@ function App() {
 
         <Route path="/admin/add-word" element={<AddWordForm />} />
         <Route path="/admin/add-studyplan" element={<StudyPlanForm />} />
+
+        <Route path="/study-plan/:studyPlanId" element={<LearningPlayground />} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -11,7 +11,6 @@ const path = require("path");
 const userscoll = require("./models/userSchema");
 const StudyPlan =  require("./models/StudyPlan");
 const Word = require("./models/Word");
-const Content = require("./models/Content");
 
 dotenv.config();
 const secretKey = process.env.JWT_SECRET || "your_secret_key";
@@ -262,19 +261,20 @@ app.get('/get-study-plans', async (req, res) => {
 
 
 
-
-app.patch('/users/update-study-plan', async (req, res) => {
+app.patch('/update-study-plan', async (req, res) => {
     try {
+      console.log("update study plan")
       const { userId, planId } = req.body;
-  
+      console.log(userId,planId);
       // Validate plan exists
       const planExists = await StudyPlan.exists({ _id: planId });
       if (!planExists) {
         return res.status(400).json({ message: 'Invalid study plan' });
       }
+      console.log(planExists);
   
       // Update user document
-      const updatedUser = await User.findByIdAndUpdate(
+      const updatedUser = await userscoll.findByIdAndUpdate(
         userId,
         { 
           study_plan: planId,
@@ -282,7 +282,7 @@ app.patch('/users/update-study-plan', async (req, res) => {
         },
         { new: true }
       );
-  
+      console.log(updatedUser);
       res.json(updatedUser);
     } catch (err) {
       res.status(500).json({ message: 'Server error' });
@@ -291,7 +291,54 @@ app.patch('/users/update-study-plan', async (req, res) => {
 
 
 
+app.get("/study-plan/:id", async (req, res) => {
+  try {
+    const plan = await StudyPlan.findById(req.params.id).populate("word_list");
+    if (!plan) {
+      return res.status(404).json({ error: "Study plan not found" });
+    }
 
+    // Distribute words into days based on daily_new_words
+    const dailyWords = [];
+    for (let i = 0; i < plan.word_list.length; i += plan.daily_new_words) {
+      dailyWords.push(plan.word_list.slice(i, i + plan.daily_new_words));
+    }
+
+    res.json({
+      name: plan.name,
+      duration_days: plan.duration_days,
+      daily_words: dailyWords,
+      daily_new_words:plan.daily_new_words,
+      total_words : plan.total_words
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+
+app.get("/study-plan/:id/day/:dayIndex", async (req, res) => {
+  try {
+    const plan = await StudyPlan.findById(req.params.id).populate("word_list");
+    if (!plan) {
+      return res.status(404).json({ error: "Study plan not found" });
+    }
+
+    const dayIndex = parseInt(req.params.dayIndex);
+    if (dayIndex < 1 || dayIndex > plan.duration_days) {
+      return res.status(400).json({ error: "Invalid day index" });
+    }
+
+    // Calculate words for the requested day
+    const startIndex = (dayIndex - 1) * plan.daily_new_words;
+    const words = plan.word_list.slice(startIndex, startIndex + plan.daily_new_words);
+
+    res.json({ day: dayIndex, words });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 
 
