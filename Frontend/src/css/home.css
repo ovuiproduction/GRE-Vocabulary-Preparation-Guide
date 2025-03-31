@@ -13,33 +13,36 @@
   color: white;
 }
 
-.logo-container {
+.home-logo-container {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-.logo {
+.home-logo {
   height: 40px;
   border-radius: 50%;
 }
 
-.logo-text {
+.home-logo-text {
   font-size: 1.5rem;
   font-weight: 600;
 }
 
-.profile-menu {
+.home-profile-menu {
   position: relative;
 }
 
-.profile-menu > button {
+.home-profile-menu > button {
   background: #1a237e;
   outline: none;
   border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.profile-circle {
+.home-profile-circle {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -53,12 +56,12 @@
   font-size: 1rem;
 }
 
-.profile-circle:hover {
+.home-profile-circle:hover {
   background: #ffd700;
   color: #1a237e;
 }
 
-.dropdown-menu {
+.home-dropdown-menu {
   position: absolute;
   right: 0;
   top: 50px;
@@ -70,14 +73,14 @@
   overflow: hidden;
 }
 
-.dropdown-menu > button {
+.home-dropdown-menu > button {
   cursor: pointer;
   outline: none;
   border: none;
   box-sizing: border-box;
 }
 
-.dropdown-item {
+.home-dropdown-item {
   width: 100%;
   padding: 1rem;
   display: flex;
@@ -88,15 +91,15 @@
   box-sizing: border-box;
 }
 
-.dropdown-item:hover {
+.home-dropdown-item:hover {
   background: #f8f9fa;
 }
 
-.logout {
+.home-logout {
   color: #d32f2f;
 }
 
-.info-section {
+.home-info-section {
   padding: 4rem 2rem;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -105,7 +108,7 @@
   margin: 0 auto;
 }
 
-.info-card {
+.home-info-card {
   background: white;
   padding: 2rem;
   border-radius: 12px;
@@ -113,26 +116,26 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
-.info-icon {
+.home-info-icon {
   font-size: 2rem;
   color: #1a237e;
   margin-bottom: 1rem;
 }
 
-.studyplan-section {
+.home-studyplan-section {
   padding: 2rem 4rem;
   max-width: 1200px;
   margin: 0 auto;
 }
 
-.plan-grid {
+.home-plan-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2rem;
   margin-top: 2rem;
 }
 
-.plan-card {
+.home-plan-card {
   background: white;
   padding: 2rem;
   border-radius: 12px;
@@ -140,12 +143,12 @@
   transition: all 0.3s ease;
 }
 
-.plan-card.selected {
+.home-plan-card.selected {
   border-color: #1a237e;
   box-shadow: 0 4px 15px rgba(26, 35, 126, 0.1);
 }
 
-.plan-button {
+.home-plan-button {
   background: #ffd700;
   color: #1a237e;
   padding: 0.75rem 1.5rem;
@@ -156,7 +159,7 @@
   transition: all 0.3s ease;
 }
 
-.plan-button:hover {
+.home-plan-button:hover {
   background: #ffc107;
   transform: translateY(-2px);
 }
@@ -166,18 +169,18 @@
     padding: 1rem;
   }
 
-  .studyplan-section {
+  .home-studyplan-section {
     padding: 2rem 1rem;
   }
 }
 
-.user-status {
+.home-user-status {
   padding: 2rem 4rem;
   max-width: 1200px;
   margin: 0 auto;
 }
 
-.status-card {
+.home-status-card {
   background: white;
   padding: 2rem;
   border-radius: 12px;
@@ -185,50 +188,51 @@
   border-left: 4px solid #1a237e;
 }
 
-.current-plan p {
+.home-current-plan p {
   margin: 0.5rem 0;
   color: #444;
 }
 
-.select-prompt {
+.home-select-prompt {
   color: #1a237e;
   font-weight: 500;
 }
 
-.selected-plan {
+.home-selected-plan {
   border-color: #1a237e;
   background: #f8f9fa;
 }
 
-.current-plan {
+.home-current-plan {
   border-top: 3px solid #1a237e;
   background: #f7f7f9 !important;
   color: #1a237e;
   padding: 1rem;
   line-height: 2rem;
+  margin-top:1rem;
 }
 
 /* Loading and Error States */
-.loading-spinner,
-.error-message {
+.home-loading-spinner,
+.home-error-message {
   text-align: center;
   padding: 2rem;
   font-size: 1.2rem;
 }
 
-.error-message {
+.home-error-message {
   color: #d32f2f;
 }
 
 /* Plan Card Enhancements */
-.plan-header {
+.home-plan-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
 }
 
-.plan-badge {
+.home-plan-badge {
   background: #e8eaf6;
   color: #1a237e;
   padding: 0.3rem 0.8rem;
@@ -236,50 +240,50 @@
   font-size: 0.9rem;
 }
 
-.plan-stats {
+.home-plan-stats {
   display: grid;
   gap: 1rem;
   margin: 1.5rem 0;
 }
 
-.stat-item {
+.home-stat-item {
   display: flex;
   align-items: center;
   gap: 0.8rem;
   color: #444;
 }
 
-.stat-item svg {
+.home-stat-item svg {
   color: #3f51b5;
 }
 
-.revision-strategy {
+.home-revision-strategy {
   background: #f8f9fa;
   padding: 1rem;
   border-radius: 8px;
   margin: 1.5rem 0;
 }
 
-.strategy-details {
+.home-strategy-details {
   display: grid;
   gap: 0.5rem;
   margin-top: 0.8rem;
 }
 
-.strategy-details p {
+.home-strategy-details p {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-size: 0.9rem;
 }
 
-.plan-button.current {
+.home-plan-button.current {
   background: #1a237e;
   color: white;
   cursor: pointer;
 }
 
-.plan-button.current:hover {
+.home-plan-button.current:hover {
   transform: none;
 }
 

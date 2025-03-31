@@ -189,19 +189,14 @@
   
   /* Modal Styles */
   .learning-playground-word-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
     width: 100%;
     height: 100%;
-    display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
   }
   
   .learning-playground-modal-overlay {
-    position: absolute;
     width: 100%;
     height: 100%;
     background: rgba(0,0,0,0.5);
@@ -264,29 +259,25 @@
     --border-color: #e0e0e0;
     --success-color: #28a745;
   }
+
   
   /* Modal Enhancements */
   .learning-playground-word-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
     width: 100%;
     height: 100%;
-    display: flex;
+    /* display: flex; */
     justify-content: center;
     align-items: center;
     z-index: 1000;
   }
   
   .learning-playground-modal-overlay {
-    position: absolute;
     width: 100%;
     height: 100%;
     background: rgba(0,0,0,0.5);
   }
   
   .learning-playground-modal-content {
-    position: relative;
     background: white;
     width: 700px;
     max-height: 85vh;

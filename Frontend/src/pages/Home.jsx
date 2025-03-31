@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
 import {
   FaChevronDown,
   FaBook,
@@ -51,7 +50,6 @@ export default function Home() {
         setStudyPlans(plansRes.data.data);
       } catch (err) {
         setFetchError("Failed to load study plans");
-      } finally {
       }
     };
 
@@ -96,50 +94,44 @@ export default function Home() {
   return (
     <div className="home-container">
       <header className="home-header">
-        <div className="logo-container">
-          <img src={logoImg} alt="GRE Master" className="logo" />
-          <span className="logo-text">GRE Vocabulary Master</span>
+        <div className="home-logo-container">
+          <img src={logoImg} alt="GRE Master" className="home-logo" />
+          <span className="home-logo-text">GRE Vocabulary Master</span>
         </div>
 
-        <div className="profile-menu">
+        <div className="home-profile-menu">
           <button
-            className="profile-icon"
+            className="home-profile-icon"
             onClick={() => setShowDropdown(!showDropdown)}
           >
-            <div className="profile-circle">
-              {userData ? (
-                <>{userData.name[0]}</>
-              ) : (
-                <>
-                  <FaChevronDown />
-                </>
-              )}
+            <div className="home-profile-circle">
+              {userData && (<>{userData.name[0]}</>)}
             </div>
           </button>
 
           {showDropdown && (
-            <div className="dropdown-menu">
-              <button className="dropdown-item">
+            <div className="home-dropdown-menu">
+              <button className="home-dropdown-item">
                 <FaBook /> My Study Plan
               </button>
-              <button className="dropdown-item">
+              <button className="home-dropdown-item">
                 <FaChartLine /> Progress
               </button>
-              <button className="dropdown-item">
+              <button className="home-dropdown-item">
                 <FaTrophy /> Achievements
               </button>
-              <button className="dropdown-item logout">Logout</button>
+              <button className="home-dropdown-item home-logout">Logout</button>
             </div>
           )}
         </div>
       </header>
 
       {userData && (
-        <section className="user-status">
-          <div className="status-card">
+        <section className="home-user-status">
+          <div className="home-status-card">
             <h3>Welcome Back, {userData.name}!</h3>
             {userData.study_plan ? (
-              <div className="current-plan">
+              <div className="home-current-plan">
                 <p>
                   Current Plan:{" "}
                   {studyPlans.find((p) => p._id === userData.study_plan)
@@ -155,7 +147,7 @@ export default function Home() {
                 </button>
               </div>
             ) : (
-              <p className="select-prompt">
+              <p className="home-select-prompt">
                 Please select a study plan to get started!
               </p>
             )}
@@ -164,25 +156,25 @@ export default function Home() {
       )}
 
       {/* Platform Info Section */}
-      <section className="info-section">
-        <div className="info-card">
-          <div className="info-icon">
+      <section className="home-info-section">
+        <div className="home-info-card">
+          <div className="home-info-icon">
             <FaBook />
           </div>
           <h3>Structured Learning</h3>
           <p>Daily curated word lists based on GRE</p>
         </div>
 
-        <div className="info-card">
-          <div className="info-icon">
+        <div className="home-info-card">
+          <div className="home-info-icon">
             <FaChartLine />
           </div>
           <h3>Progress Tracking</h3>
           <p>Detailed analytics and retention metrics</p>
         </div>
 
-        <div className="info-card">
-          <div className="info-icon">
+        <div className="home-info-card">
+          <div className="home-info-icon">
             <FaTrophy />
           </div>
           <h3>Achievements</h3>
@@ -191,43 +183,43 @@ export default function Home() {
       </section>
 
       {/* Study Plan Section */}
-      <section className="studyplan-section">
+      <section className="home-studyplan-section">
         <h2>Choose Your Study Plan</h2>
         {fetchError && <>{fetchError}</>}
-        <div className="plan-grid">
+        <div className="home-plan-grid">
           {studyPlans &&
             studyPlans.map((plan) => (
               <div
                 key={plan._id}
-                className={`plan-card ${
-                  selectedPlan === plan._id ? "selected" : ""
+                className={`home-plan-card ${
+                  selectedPlan === plan._id ? "home-selected" : ""
                 }`}
               >
-                <div className="plan-header">
+                <div className="home-plan-header">
                   <h3>{plan.name}</h3>
-                  <div className="plan-badge">
+                  <div className="home-plan-badge">
                     <span>{plan.revision_strategy.mode} revision</span>
                   </div>
                 </div>
 
-                <div className="plan-stats">
-                  <div className="stat-item">
+                <div className="home-plan-stats">
+                  <div className="home-stat-item">
                     <FaCheckCircle />
                     <span>{plan.duration_days} Days</span>
                   </div>
-                  <div className="stat-item">
+                  <div className="home-stat-item">
                     <FaBook />
                     <span>{plan.daily_new_words} New Words/Day</span>
                   </div>
-                  <div className="stat-item">
+                  <div className="home-stat-item">
                     <FaChartLine />
                     <span>{plan.total_words} Total Words</span>
                   </div>
                 </div>
 
-                <div className="revision-strategy">
+                <div className="home-revision-strategy">
                   <h4>Revision Strategy:</h4>
-                  <div className="strategy-details">
+                  <div className="home-strategy-details">
                     <p>
                       <FaInfoCircle /> Min Attempts:{" "}
                       {plan.revision_strategy.rules.min_incorrect_attempts}
@@ -245,8 +237,8 @@ export default function Home() {
                       ? handleStartLearning
                       : () => handlePlanSelect(plan._id)
                   }
-                  className={`plan-button ${
-                    selectedPlan === plan._id ? "current" : ""
+                  className={`home-plan-button ${
+                    selectedPlan === plan._id ? "home-current" : ""
                   }`}
                 >
                   {selectedPlan === plan._id ? "Start learning" : "Select Plan"}
