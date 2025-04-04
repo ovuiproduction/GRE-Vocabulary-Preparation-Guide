@@ -1,0 +1,131 @@
+.add-badge-form-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  
+  .add-badge-form-title {
+    font-size: 1.8rem;
+    text-align: center;
+    color: #1a237e;
+    margin-bottom: 1.5rem;
+  }
+  
+  .add-badge-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+  
+  .add-badge-form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .add-badge-form-label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+  
+  .add-badge-form-input,
+  .add-badge-form-select,
+  .add-badge-form-file {
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  
+  .add-badge-form-input:focus,
+  .add-badge-form-select:focus {
+    border-color: #3f51b5;
+  }
+  
+  .add-badge-form-preview {
+    margin-top: 0.5rem;
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+  }
+  
+  .add-badge-form-submit-btn {
+    background-color: #3f51b5;
+    color: #fff;
+    padding: 0.9rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .add-badge-form-submit-btn:hover {
+    background-color: #1a237e;
+  }
+  
+  @media (max-width: 480px) {
+    .add-badge-form-container {
+      padding: 1.2rem;
+    }
+  
+    .add-badge-form-title {
+      font-size: 1.5rem;
+    }
+  }
+
+
+.add-badge-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background:white;
+    color: #2e7d32;
+    padding: 1rem 1.5rem;
+    border-left: 5px solid #4caf50;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-weight: 600;
+    animation: fadeInUp 0.5s ease forwards;
+    z-index: 9999;
+  }
+  
+  .add-badge-toast-bar {
+    height: 4px;
+    width: 100%;
+    background: #4caf50;
+    animation: progressBar 3s linear forwards;
+    border-radius: 0 0 4px 4px;
+    margin-top: 6px;
+  }
+  
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes progressBar {
+    from {
+      width: 0%;
+    }
+    to {
+      width: 100%;
+    }
+  }
+  
+  

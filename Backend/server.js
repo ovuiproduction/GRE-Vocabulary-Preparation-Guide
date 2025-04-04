@@ -2,13 +2,10 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const dotenv = require("dotenv");
 const multer = require("multer");
 const path = require("path");
 
-const userscoll = require("./models/userSchema");
+const users = require("./models/users");
 const StudyPlan = require("./models/StudyPlan");
 const Word = require("./models/Word");
 const LearningProgress = require("./models/LearningProgress");
@@ -16,161 +13,18 @@ const Test = require("./models/Test");
 const Question = require("./models/Question");
 const TestTrack = require("./models/TestTrack");
 const IncorrectQuestions = require("./models/IncorrectQuestions");
+const Badge = require("./models/Badge");
 
-dotenv.config();
-const secretKey = process.env.JWT_SECRET || "your_secret_key";
+const adminRoutes = require("./routes/adminRoutes");
+const authRoutes = require("./routes/authRoutes");
+
+const port = 5000;
 
 const app = express();
 app.use(express.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
-const nodemailer = require("nodemailer");
-
-const port = 5000;
-
-mongoose
-  .connect("mongodb://localhost:27017/gredb")
-  .then(() => console.log("Connected to database"))
-  .catch((err) => console.error("Database connection error:", err));
-
-app.get("/", (req, res) => {
-  res.send("This is server");
-});
-
-// User Signup
-app.post("/signup-user", async (req, res) => {
-  try {
-    const { name, email, phone } = req.body;
-
-    const existingUser = await userscoll.findOne({
-      $or: [{ email }, { phone }],
-    });
-
-    if (existingUser) {
-      return res.status(400).json({
-        message: "User with this email or phone already exists",
-      });
-    }
-
-    user = new userscoll({
-      name,
-      email,
-      phone,
-    });
-
-    await user.save();
-
-    res.status(201).json({ message: "User signup successful" });
-  } catch (err) {
-    console.error("Signup Error:", err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-// User Login
-app.post("/login-user", async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    const user = await userscoll.findOne({ email });
-    if (!user) return res.status(400).json({ message: "Invalid credentials" });
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
-      return res.status(400).json({ message: "Invalid credentials" });
-
-    const token = jwt.sign(
-      {
-        userId: user._id,
-        name: user.name,
-        email: user.email,
-        state: user.state,
-        phone: user.phone,
-        district: user.district,
-        coins: user.coins,
-      },
-      secretKey,
-      { expiresIn: "1h" }
-    );
-
-    res.json({ token, user });
-  } catch (err) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-// Nodemailer Transporter
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
-
-// Generate Random 6-Digit OTP
-const generateOTP = () =>
-  Math.floor(100000 + Math.random() * 900000).toString();
-
-// Request OTP
-app.post("/request-otp", async (req, res) => {
-  try {
-    const { email } = req.body;
-
-    const user = await userscoll.findOne({ email });
-    if (!user) return res.status(400).json({ message: "User not found" });
-
-    // Generate OTP & Store in DB
-    let otp = generateOTP();
-    user.otp = otp;
-    await user.save();
-
-    // Send OTP via Email
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: "Your OTP for Login",
-      text: `Your OTP is: ${otp}. It will expire in 5 minutes.`,
-    };
-
-    await transporter.sendMail(mailOptions);
-
-    res.json({ message: "OTP sent successfully" });
-  } catch (err) {
-    res.status(500).json({ message: "Error sending OTP", error: err.message });
-  }
-});
-
-app.post("/verify-otp", async (req, res) => {
-  try {
-    const { email, otp } = req.body;
-
-    const user = await userscoll.findOne({ email });
-    if (!user || user.otp !== otp) {
-      return res.status(400).json({ message: "Invalid OTP" });
-    }
-
-    // Clear OTP after successful login
-    user.otp = null;
-    await user.save();
-
-    // Generate JWT Token
-    const token = jwt.sign(
-      { userId: user._id, email: user.email, name: user.name },
-      secretKey,
-      { expiresIn: "1h" }
-    );
-
-    res.json({ message: "Login successful", token, user });
-  } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Error verifying OTP", error: err.message });
-  }
-});
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
@@ -182,6 +36,19 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
+
+mongoose
+  .connect("mongodb://localhost:27017/gredb")
+  .then(() => console.log("Connected to database"))
+  .catch((err) => console.error("Database connection error:", err));
+
+
+app.get("/", (req, res) => {
+  res.send("This is server");
+});
+
+app.use("/admin", adminRoutes);
+app.use("/auth/user", authRoutes);
 
 // Upload route
 app.post("/upload-media", upload.single("file"), (req, res) => {
@@ -196,27 +63,6 @@ app.post("/upload-media", upload.single("file"), (req, res) => {
   res.json({ fileUrl });
 });
 
-// In your server route
-app.post("/insert-word", async (req, res) => {
-  try {
-    const content = req.body.content || {};
-
-    const newWord = new Word({
-      ...req.body,
-      content: {
-        stories: Array.isArray(content.stories) ? content.stories : [],
-        mnemonics: Array.isArray(content.mnemonics) ? content.mnemonics : [],
-        cartoons: Array.isArray(content.cartoons) ? content.cartoons : [],
-        clips: Array.isArray(content.clips) ? content.clips : [],
-      },
-    });
-
-    await newWord.save();
-    res.status(201).json(newWord);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-});
 
 // Get all words for selection
 app.get("/get-words", async (req, res) => {
@@ -225,27 +71,6 @@ app.get("/get-words", async (req, res) => {
     res.json(words);
   } catch (err) {
     res.status(500).json({ message: "Error fetching words" });
-  }
-});
-
-// Create new study plan
-app.post("/set-study-plan", async (req, res) => {
-  try {
-    // Validate word_list
-    const validWords = await Word.find({
-      _id: { $in: req.body.word_list },
-    });
-
-    if (validWords.length !== req.body.word_list.length) {
-      return res.status(400).json({ message: "Invalid words in word list" });
-    }
-
-    const newPlan = new StudyPlan(req.body);
-    await newPlan.save();
-
-    res.status(201).json(newPlan);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
   }
 });
 
@@ -282,7 +107,7 @@ app.patch("/update-study-plan", async (req, res) => {
     console.log(planExists);
 
     // Update user document
-    const updatedUser = await userscoll.findByIdAndUpdate(
+    const updatedUser = await users.findByIdAndUpdate(
       userId,
       {
         study_plan: planId,
@@ -391,41 +216,6 @@ app.get("/get-words/study-plan/:studyPlanId", async (req, res) => {
   }
 });
 
-app.post("/admin/add-question", async (req, res) => {
-  try {
-    const {
-      word_id,
-      question_type,
-      question,
-      options,
-      answer,
-      explanation,
-      difficulty,
-    } = req.body;
-
-    if (!word_id || !question || !answer) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-
-    const newQuestion = new Question({
-      word_id,
-      question_type,
-      question,
-      options: question_type === "MCQ" ? options : [],
-      answer,
-      explanation,
-      difficulty: difficulty || "medium", // Default difficulty is medium
-    });
-
-    await newQuestion.save();
-    res
-      .status(201)
-      .json({ message: "Question added successfully", question: newQuestion });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to add question" });
-  }
-});
-
 app.get("/get-questions/study-plan/:id/day/:dayIndex", async (req, res) => {
   try {
     const plan = await StudyPlan.findById(req.params.id).populate("word_list");
@@ -453,32 +243,6 @@ app.get("/get-questions/study-plan/:id/day/:dayIndex", async (req, res) => {
     res.json({ day: dayIndex, questions });
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch questions" });
-  }
-});
-
-// Route to create a new test
-app.post("/admin/add-test", async (req, res) => {
-  try {
-    const { studyPlanId, day, questions, duration, testType } = req.body;
-
-    if (!studyPlanId || !day || !questions.length) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-
-    const newTest = new Test({
-      studyPlanId,
-      day,
-      questions,
-      duration: duration || 10, // Default duration is 10 minutes
-      testType: testType || "daily",
-    });
-
-    await newTest.save();
-    res
-      .status(201)
-      .json({ message: "Test created successfully", test: newTest });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to create test" });
   }
 });
 
@@ -567,6 +331,8 @@ app.post("/submit-test", async (req, res) => {
       await IncorrectQuestions.insertMany(incorrectQuestionsList);
     }
 
+    await checkAndAssignBadges(userId, score);
+
     res.json({
       message: "Test submitted successfully",
       score,
@@ -578,6 +344,55 @@ app.post("/submit-test", async (req, res) => {
     res.status(500).json({ error: "Failed to submit test" });
   }
 });
+
+const checkAndAssignBadges = async (userId, latestScore) => {
+  const badges = await Badge.find({
+    "criteria.type": { $in: ["test_score", "streak"] },
+  });
+
+  const user = await users.findById(userId);
+  const pastTests = await TestTrack.find({ userId }).sort({ date: 1 }); // sorted by time
+
+  const userScores = pastTests.map((t) => t.score); // assuming `score` is out of 100
+
+  const qualifiedBadges = [];
+
+  for (const badge of badges) {
+    const { type, threshold } = badge.criteria;
+
+    // Avoid duplicate assignment
+    if (user.badges.includes(badge._id)) continue;
+
+    if (type === "test_score" && latestScore >= threshold) {
+      qualifiedBadges.push(badge._id);
+    }
+
+    if (type === "streak") {
+      const streak = countHighScoreStreak([...userScores, latestScore], 80);
+      if (streak >= threshold) {
+        qualifiedBadges.push(badge._id);
+      }
+    }
+  }
+
+  if (qualifiedBadges.length > 0) {
+    user.badges.push(...qualifiedBadges);
+    await user.save();
+  }
+};
+
+function countHighScoreStreak(scores, minScore) {
+  let count = 0;
+  for (let i = scores.length - 1; i >= 0; i--) {
+    if (scores[i] >= minScore) {
+      count++;
+    } else {
+      break;
+    }
+  }
+  return count;
+}
+
 app.listen(port, () => {
   console.log(`Server running on ${port}`);
 });

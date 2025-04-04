@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import "../css/study_plan.css";
 
-const StudyPlanForm = () => {
+const AddStudyPlanForm = () => {
   const [formData, setFormData] = useState({
     name: '',
     duration_days: 30,
@@ -75,7 +75,7 @@ const StudyPlanForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/set-study-plan', formData);
+      await axios.post('http://localhost:5000/admin/add-study-plan', formData);
       alert('Study plan created successfully!');
       // Reset form
       setFormData({
@@ -220,4 +220,4 @@ const StudyPlanForm = () => {
   );
 };
 
-export default StudyPlanForm;
+export default AddStudyPlanForm;

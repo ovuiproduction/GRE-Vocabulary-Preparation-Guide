@@ -1,24 +1,23 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
 import CoverPage from './pages/CoverPage';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 
-
-import StudyPlanForm from './pages/StudyPlanForm';
-import AddWordForm from './pages/AddWordForm'; 
-
 import LearningPlayground from "./pages/LearningPlayGround";
-
 import WordForest from './pages/WordForest';
+import TestPage from './pages/TestPage';
 
+
+import AdminDashboard from './pages/AdminDashboard';
+import AddBadgeForm from './pages/AddBadgeForm';
+import AddStudyPlanForm from './pages/AddStudyPlanForm';
+import AddWordForm from './pages/AddWordForm'; 
 import AddQuestionForm from './pages/AddQuestionForm';
-
 import AddTestForm from './pages/AddTestForm';
-
-import TestPage from './pages/TestPage'
 
 function App() {
   return (
@@ -29,11 +28,12 @@ function App() {
         <Route path="/signup/user" element={<Signup />} />
         <Route path="/home" element={<Home />} />
 
-
+        <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/add-word" element={<AddWordForm />} />
-        <Route path="/admin/add-studyplan" element={<StudyPlanForm />} />
+        <Route path="/admin/add-studyplan" element={<AddStudyPlanForm />} />
         <Route path="/admin/add-question" element={<AddQuestionForm />} />
         <Route path="/admin/add-test" element={<AddTestForm />} />
+        <Route path="/admin/add-badge" element={<AddBadgeForm />} />
         
 
         <Route path="/study-plan/:studyPlanId" element={<LearningPlayground />} />

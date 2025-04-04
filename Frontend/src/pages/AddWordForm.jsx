@@ -100,7 +100,7 @@ const AddWordForm = () => {
         },
       };
 
-      await axios.post("http://localhost:5000/insert-word", payload);
+      await axios.post("http://localhost:5000/admin/add-word", payload);
 
       // Reset form PROPERLY
       setFormData({

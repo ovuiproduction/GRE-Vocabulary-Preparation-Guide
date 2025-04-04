@@ -7,7 +7,7 @@ const contentSchema = new mongoose.Schema({
       type: Number,
       default: 0
     },
-    created_by: {
+    created_by: { 
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
     }
