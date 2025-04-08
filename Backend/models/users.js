@@ -41,6 +41,13 @@ const userSchema = new Schema({
     default: 0,
     min: 0,
   },
+  startDate: {
+    type: Date,
+  },
+  started_learning: {
+    type: Boolean,
+    default: false,
+  },  
   total_points: {
     type: Number,
     default: 0,

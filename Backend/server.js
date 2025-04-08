@@ -4,6 +4,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const multer = require("multer");
 const path = require("path");
+const axios = require("axios");
 
 const users = require("./models/users");
 const StudyPlan = require("./models/StudyPlan");
@@ -14,6 +15,8 @@ const Question = require("./models/Question");
 const TestTrack = require("./models/TestTrack");
 const IncorrectQuestions = require("./models/IncorrectQuestions");
 const Badge = require("./models/Badge");
+const StreakTracker = require("./models/StreakTracker");
+const DayWiseProgress = require("./models/DayWiseProgress");
 
 const adminRoutes = require("./routes/adminRoutes");
 const authRoutes = require("./routes/authRoutes");
@@ -50,13 +53,18 @@ app.get("/", (req, res) => {
 app.use("/admin", adminRoutes);
 app.use("/auth/user", authRoutes);
 
+
+app.get("/user/:id",async (req,res)=>{
+  const user = await users.findById(req.params.id);
+  res.json(user);
+});
+
 // Upload route
 app.post("/upload-media", upload.single("file"), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: "No file uploaded" });
   }
 
-  // Construct file URL
   const fileUrl = `${req.protocol}://${req.get("host")}/uploads/${
     req.file.filename
   }`;
@@ -96,16 +104,14 @@ app.get("/get-study-plans", async (req, res) => {
 
 app.patch("/update-study-plan", async (req, res) => {
   try {
-    console.log("update study plan");
     const { userId, planId } = req.body;
-    console.log(userId, planId);
+   
     // Validate plan exists
     const planExists = await StudyPlan.exists({ _id: planId });
     if (!planExists) {
       return res.status(400).json({ message: "Invalid study plan" });
     }
-    console.log(planExists);
-
+   
     // Update user document
     const updatedUser = await users.findByIdAndUpdate(
       userId,
@@ -115,7 +121,6 @@ app.patch("/update-study-plan", async (req, res) => {
       },
       { new: true }
     );
-    console.log(updatedUser);
     res.json(updatedUser);
   } catch (err) {
     res.status(500).json({ message: "Server error" });
@@ -147,47 +152,108 @@ app.get("/study-plan/:id", async (req, res) => {
   }
 });
 
-app.get("/get-words/study-plan/:id/day/:dayIndex", async (req, res) => {
+app.get("/get-words/:studyPlanId/day/:dayIndex", async (req, res) => {
+  const { studyPlanId, dayIndex } = req.params;
+
   try {
-    const plan = await StudyPlan.findById(req.params.id).populate("word_list");
-    if (!plan) {
-      return res.status(404).json({ error: "Study plan not found" });
-    }
+    // Fetch words where dayIndex has an entry for the given studyPlanId with the given day number
+    const words = await Word.find({
+      [`dayIndex.${studyPlanId}`]: parseInt(dayIndex),
+    });
 
-    const dayIndex = parseInt(req.params.dayIndex);
-    if (dayIndex < 1 || dayIndex > plan.duration_days) {
-      return res.status(400).json({ error: "Invalid day index" });
-    }
-
-    // Calculate words for the requested day
-    const startIndex = (dayIndex - 1) * plan.daily_new_words;
-    const words = plan.word_list.slice(
-      startIndex,
-      startIndex + plan.daily_new_words
-    );
-
-    res.json({ day: dayIndex, words });
+    res.json({ words });
   } catch (error) {
+    console.error("Error fetching words:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
 
+
+// app.put(
+//   "/update-learning-progress/:userId/:studyPlanId/day/:dayIndex/:wordId",
+//   async (req, res) => {
+//     const { userId, studyPlanId,dayIndex, wordId } = req.params;
+//     try {
+//       await LearningProgress.findOneAndUpdate(
+//         { user_id: userId, word_id: wordId, studyPlanId: studyPlanId },
+//         { status: "learned", learned_on: new Date() },
+//         { upsert: true, new: true }
+//       );
+//       res.status(200).json({ message: "Word marked as learned" });
+//     } catch (error) {
+//       res.status(500).json({ error: "Failed to update progress" });
+//     }
+//   }
+// );
+
 app.put(
-  "/update-learning-progress/:userId/:studyPlanId/:wordId",
+  "/update-learning-progress/:userId/:studyPlanId/day/:dayIndex/:wordId",
   async (req, res) => {
-    const { userId, studyPlanId, wordId } = req.params;
+    const { userId, studyPlanId, dayIndex, wordId } = req.params;
+
     try {
+      // Step 1: Update word-level progress
       await LearningProgress.findOneAndUpdate(
-        { user_id: userId, word_id: wordId, studyPlanId: studyPlanId },
+        { user_id: userId, word_id: wordId, studyPlanId },
         { status: "learned", learned_on: new Date() },
         { upsert: true, new: true }
       );
-      res.status(200).json({ message: "Word marked as learned" });
+
+      // Step 2: Update or create DayWiseProgress
+      let dayProgress = await DayWiseProgress.findOne({
+        user_id: userId,
+        studyPlanId,
+        dayIndex,
+      });
+
+      if (!dayProgress) {
+        dayProgress = new DayWiseProgress({
+          user_id: userId,
+          studyPlanId,
+          dayIndex,
+          completedWords: [wordId],
+        });
+      } else {
+        if (!dayProgress.completedWords.includes(wordId)) {
+          dayProgress.completedWords.push(wordId);
+        }
+      }
+
+      // Step 3: Check if all words for the day are learned
+      const studyPlan = await StudyPlan.findById(studyPlanId).populate("word_list");
+
+      if (!studyPlan || !studyPlan.word_list) {
+        return res.status(400).json({ error: "Study plan or words not found" });
+      }
+
+      const dailyWords = studyPlan.word_list.filter((word) => {
+        return word.dayIndex === parseInt(dayIndex);
+      });
+
+      const learnedWordIds = dayProgress.completedWords.map((id) => String(id));
+      const dailyWordIds = dailyWords.map((word) => String(word._id));
+
+      const allCompleted = dailyWordIds.every((id) => learnedWordIds.includes(id));
+
+      if (allCompleted) {
+        dayProgress.completedOnDay = true;
+        dayProgress.completedAt = new Date();
+      }
+
+      await dayProgress.save();
+
+      // Step 4: Update streak
+      await axios.put(`http://localhost:5000/update-streak/${userId}/${studyPlanId}`);
+
+      res.status(200).json({ message: "Progress updated successfully" });
     } catch (error) {
+      console.error("Error updating progress:", error);
       res.status(500).json({ error: "Failed to update progress" });
     }
   }
 );
+
+
 
 app.get("/get-learning-progress/:userId/:studyPlanId", async (req, res) => {
   try {
@@ -392,6 +458,205 @@ function countHighScoreStreak(scores, minScore) {
   }
   return count;
 }
+
+
+app.post("/start-learning", async (req, res) => {
+  try {
+    const { userId, studyPlanId } = req.body;
+
+    if (!userId || !studyPlanId) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    const today = new Date();
+
+    // 1. Update User startDate
+    await users.findByIdAndUpdate(userId, {
+      startDate: today,
+      started_learning :true
+    });
+
+    // 2. Create or update StreakTracker
+    const existingTracker = await StreakTracker.findOne({
+      user_id: userId,
+      studyPlanId,
+    });
+
+    if (existingTracker) {
+      // If exists, reset streak and update startDate
+      existingTracker.startDate = today;
+      existingTracker.currentStreak = 0;
+      existingTracker.completedDays = [];
+      existingTracker.lastCheckedDate = null;
+      await existingTracker.save();
+    } else {
+      // Create new tracker
+      const newTracker = new StreakTracker({
+        user_id: userId,
+        studyPlanId,
+        startDate: today,
+        currentStreak: 0,
+        completedDays: [],
+        lastCheckedDate: null,
+      });
+      await newTracker.save();
+    }
+
+    res.status(200).json({ message: "Learning session started!" });
+  } catch (error) {
+    console.error("Error starting learning:", error);
+    res.status(500).json({ error: "Failed to start learning" });
+  }
+});
+
+// app.put("/update-streak/:userId/:studyPlanId", async (req, res) => {
+//   const { userId, studyPlanId } = req.params;
+
+//   try {
+//     const user = await users.findById(userId);
+//     if (!user || !user.startDate) {
+//       return res.status(400).json({ error: "User or startDate not found" });
+//     }
+
+//     const plan = await StudyPlan.findById(studyPlanId);
+//     if (!plan) {
+//       return res.status(404).json({ error: "Study plan not found" });
+//     }
+
+//     const today = new Date();
+//     const startDate = new Date(user.startDate);
+//     const dayDiff =
+//       Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
+
+//     // Don't go beyond plan duration
+//     const totalDays = Math.min(dayDiff, plan.duration_days);
+
+//     let currentStreak = 0;
+
+//     for (let day = 1; day <= totalDays; day++) {
+//       const progress = await DayWiseProgress.findOne({
+//         user_id: userId,
+//         studyPlanId,
+//         dayIndex: day,
+//       });
+    
+//       if (!progress) {
+//         break;
+//       }
+    
+//       const assignedWordsDocs = await Word.find({
+//         [`dayIndex.${studyPlanId}`]: day,
+//       }).select("_id");
+      
+//       const assignedWordIds = assignedWordsDocs.map(w => w._id.toString());
+      
+//       const completed = (progress.completedWords || []).map(id => id.toString());
+      
+//       const allCompleted = assignedWordIds.every(wordId =>
+//         completed.includes(wordId)
+//       );
+
+//       console.log(allCompleted);
+
+//       if (!allCompleted) {
+//         break;
+//       }
+    
+//       currentStreak++;
+//     }
+     
+
+//     user.streak = currentStreak;
+//     await user.save();
+
+//     res.json({ message: "Streak updated", streak: currentStreak });
+//   } catch (error) {
+//     console.error("Error updating streak:", error);
+//     res.status(500).json({ error: "Failed to update streak" });
+//   }
+// });
+
+
+app.put("/update-streak/:userId/:studyPlanId", async (req, res) => {
+  const { userId, studyPlanId } = req.params;
+
+  try {
+    const user = await users.findById(userId);
+    if (!user || !user.startDate) {
+      return res.status(400).json({ error: "User or startDate not found" });
+    }
+
+    const plan = await StudyPlan.findById(studyPlanId);
+    if (!plan) {
+      return res.status(404).json({ error: "Study plan not found" });
+    }
+
+    const today = new Date();
+    const startDate = new Date(user.startDate);
+    const dayDiff =
+      Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
+
+    const totalDays = Math.min(dayDiff, plan.duration_days);
+
+    let currentStreak = 0;
+    const completedDays = [];
+
+    for (let day = 1; day <= totalDays; day++) {
+      const progress = await DayWiseProgress.findOne({
+        user_id: userId,
+        studyPlanId,
+        dayIndex: day,
+      });
+
+      if (!progress) break;
+
+      const assignedWordsDocs = await Word.find({
+        [`dayIndex.${studyPlanId}`]: day,
+      }).select("_id");
+
+      const assignedWordIds = assignedWordsDocs.map(w => w._id.toString());
+      const completed = (progress.completedWords || []).map(id => id.toString());
+
+      const allCompleted = assignedWordIds.every(wordId =>
+        completed.includes(wordId)
+      );
+
+      if (!allCompleted) break;
+
+      currentStreak++;
+      completedDays.push(day);
+    }
+
+    // Update user streak
+    user.streak = currentStreak;
+    await user.save();
+
+    // Update or create StreakTracker
+    const updatedTracker = await StreakTracker.findOneAndUpdate(
+      { user_id: userId, studyPlanId },
+      {
+        $set: {
+          currentStreak,
+          lastCheckedDate: today,
+        },
+        $addToSet: {
+          completedDays: { $each: completedDays },
+        },
+      },
+      { upsert: true, new: true }
+    );
+
+    res.json({
+      message: "Streak updated",
+      streak: currentStreak,
+      streakTracker: updatedTracker,
+    });
+  } catch (error) {
+    console.error("Error updating streak:", error);
+    res.status(500).json({ error: "Failed to update streak" });
+  }
+});
+
 
 app.listen(port, () => {
   console.log(`Server running on ${port}`);

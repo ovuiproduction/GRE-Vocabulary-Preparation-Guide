@@ -26,7 +26,7 @@ const WordForest = () => {
     try {
       const [wordsRes, progressRes] = await Promise.all([
         axios.get(
-          `http://localhost:5000/get-words/study-plan/${studyPlanId}/day/${selectedDay}`
+          `http://localhost:5000/get-words/${studyPlanId}/day/${selectedDay}`
         ),
         axios.get(
           `http://localhost:5000/get-learning-progress/${userData._id}/${studyPlanId}`
@@ -54,7 +54,7 @@ const WordForest = () => {
 
     try {
       await axios.put(
-        `http://localhost:5000/update-learning-progress/${userData._id}/${studyPlanId}/${selectedWord._id}`,
+        `http://localhost:5000/update-learning-progress/${userData._id}/${studyPlanId}/day/${selectedDay}/${selectedWord._id}`,
         {
           status: "learned",
           learned_on: new Date(),

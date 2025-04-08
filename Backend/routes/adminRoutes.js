@@ -108,6 +108,70 @@ router.post("/add-test", async (req, res) => {
   }
 });
 
+
+router.post("/add-question-and-update-test", async (req, res) => {
+  try {
+    const {
+      word_id,
+      question_type,
+      question,
+      options,
+      answer,
+      explanation,
+      difficulty,
+    } = req.body;
+
+    if (!word_id || !question || !answer) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    // 1. Create Question
+    const newQuestion = new Question({
+      word_id,
+      question_type,
+      question,
+      options: question_type === "MCQ" ? options : [],
+      answer,
+      explanation,
+      difficulty: difficulty || "medium",
+    });
+    await newQuestion.save();
+
+    // 2. Get the Word's dayIndex map
+    const word = await Word.findById(word_id);
+    if (word && word.dayIndex) {
+      for (const [planId, day] of word.dayIndex.entries()) {
+        const existingTest = await Test.findOne({ studyPlanId: planId, day });
+
+        if (existingTest) {
+          if (!existingTest.questions.includes(newQuestion._id)) {
+            existingTest.questions.push(newQuestion._id);
+            await existingTest.save();
+          }
+        } else {
+          const newTest = new Test({
+            studyPlanId: planId,
+            day,
+            questions: [newQuestion._id],
+            duration: 10, // Default
+            testType: "daily",
+          });
+          await newTest.save();
+        }
+      }
+    }
+
+    res
+      .status(201)
+      .json({ message: "Question added and test updated", question: newQuestion });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to add question" });
+  }
+});
+
+
 router.post("/add-question", async (req, res) => {
   try {
     const {
@@ -145,12 +209,35 @@ router.post("/add-question", async (req, res) => {
 
 
 // In your server route
+// router.post("/add-word", async (req, res) => {
+//   try {
+//     const content = req.body.content || {};
+
+//     const newWord = new Word({
+//       ...req.body,
+//       content: {
+//         stories: Array.isArray(content.stories) ? content.stories : [],
+//         mnemonics: Array.isArray(content.mnemonics) ? content.mnemonics : [],
+//         cartoons: Array.isArray(content.cartoons) ? content.cartoons : [],
+//         clips: Array.isArray(content.clips) ? content.clips : [],
+//       },
+//     });
+
+//     await newWord.save();
+//     res.status(201).json(newWord);
+//   } catch (err) {
+//     res.status(400).json({ message: err.message });
+//   }
+// });
+
 router.post("/add-word", async (req, res) => {
   try {
     const content = req.body.content || {};
-
+    const studyPlans = req.body.study_plan || [];
     const newWord = new Word({
       ...req.body,
+      study_plan: studyPlans,
+      dayIndex: req.body.dayIndex || {} ,
       content: {
         stories: Array.isArray(content.stories) ? content.stories : [],
         mnemonics: Array.isArray(content.mnemonics) ? content.mnemonics : [],
@@ -160,11 +247,22 @@ router.post("/add-word", async (req, res) => {
     });
 
     await newWord.save();
+
+    // Update each selected StudyPlan with the new word
+    await Promise.all(
+      studyPlans.map(async (planId) => {
+        await StudyPlan.findByIdAndUpdate(planId, {
+          $addToSet: { word_list: newWord._id }, // avoid duplicates
+        });
+      })
+    );
+
     res.status(201).json(newWord);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 });
+
 
 // Create new study plan
 router.post("/add-study-plan", async (req, res) => {

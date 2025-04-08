@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import {
-  FaChevronDown,
   FaBook,
   FaChartLine,
   FaTrophy,
@@ -9,6 +8,7 @@ import {
 } from "react-icons/fa";
 import axios from "axios";
 import logoImg from "../Assets/images/logo-image.png";
+import { useNavigate } from "react-router-dom";
 
 import "../css/home.css";
 
@@ -19,20 +19,114 @@ export default function Home() {
   const [userData, setUserData] = useState(null);
   const [fetchError, setFetchError] = useState("");
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUserData(JSON.parse(storedUser));
-    }
-  }, []);
+  const navigate = useNavigate();
 
-  const handleStartLearning = () => {
-    if (userData.study_plan) {
-      window.open(`/study-plan/${userData.study_plan}`, "_blank");
-    } else {
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const user = JSON.parse(storedUser);
+        setUserData(user);
+        try {
+          const res = await axios.get(`http://localhost:5000/user/${user._id}`);
+          if (res.data) {
+            setUserData(res.data);
+            localStorage.setItem("user", JSON.stringify(res.data)); // keep localStorage up to date
+          }
+        } catch (err) {
+          console.error("Failed to fetch updated user data", err);
+        }
+      }
+    };
+  
+    fetchUser();
+  
+    const handleFocus = () => {
+      fetchUser();
+    };
+  
+    window.addEventListener("focus", handleFocus);
+  
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, []);
+  
+
+  // const handleStartLearning = async () => {
+  //   if (!userData.study_plan) {
+  //     alert("No study plan selected!");
+  //     return;
+  //   }
+  
+  //   try {
+  //     const response = await fetch("http://localhost:5000/start-learning", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         userId: userData._id,
+  //         studyPlanId: userData.study_plan,
+  //       }),
+  //     });
+  
+  //     const data = await response.json();
+  //     if (response.ok) {
+  //       // Redirect to study page
+  //       window.open(`/study-plan/${userData.study_plan}`, "_blank");
+  //     } else {
+  //       alert(data.error || "Failed to start learning");
+  //     }
+  //   } catch (err) {
+  //     console.error(err);
+  //     alert("Something went wrong");
+  //   }
+  // };
+  
+
+  const handleStartLearning = async () => {
+    if (!userData.study_plan) {
       alert("No study plan selected!");
+      return;
+    }
+  
+    // Only call backend if not started yet
+    if (!userData.started_learning) {
+      try {
+        const response = await fetch("http://localhost:5000/start-learning", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: userData._id,
+            studyPlanId: userData.study_plan,
+          }),
+        });
+  
+        const data = await response.json();
+        if (response.ok) {
+          // Update localStorage and state
+          const updatedUser = { ...userData, started_learning: true };
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+          setUserData(updatedUser);
+  
+          window.open(`/study-plan/${userData.study_plan}`, "_blank");
+        } else {
+          alert(data.error || "Failed to start learning");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Something went wrong");
+      }
+    } else {
+      // Already started, directly navigate
+      window.open(`/study-plan/${userData.study_plan}`, "_blank");
     }
   };
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -91,6 +185,11 @@ export default function Home() {
     }
   };
 
+  const handleLogOut = () => {
+    localStorage.clear();
+    navigate("/");
+  };
+
   return (
     <div className="home-container">
       <header className="home-header">
@@ -120,7 +219,7 @@ export default function Home() {
               <button className="home-dropdown-item">
                 <FaTrophy /> Achievements
               </button>
-              <button className="home-dropdown-item home-logout">Logout</button>
+              <button onClick={handleLogOut} className="home-dropdown-item home-logout">Logout</button>
             </div>
           )}
         </div>
@@ -129,7 +228,7 @@ export default function Home() {
       {userData && (
         <section className="home-user-status">
           <div className="home-status-card">
-            <h3>Welcome Back, {userData.name}!</h3>
+            <h3>Welcome , {userData.name}!</h3>
             {userData.study_plan ? (
               <div className="home-current-plan">
                 <p>

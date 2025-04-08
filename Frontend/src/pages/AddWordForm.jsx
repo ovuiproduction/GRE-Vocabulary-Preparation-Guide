@@ -1,9 +1,16 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useEffect } from "react";
 
 import "../css/addwordform.css";
 
 const AddWordForm = () => {
+  const [newSynonym, setNewSynonym] = useState("");
+  const [newAntonym, setNewAntonym] = useState("");
+  const [studyPlans, setStudyPlans] = useState([]);
+  const [loadingPlans, setLoadingPlans] = useState(true);
+  const [error, setError] = useState("");
+
   const [formData, setFormData] = useState({
     word: "",
     definition: "",
@@ -11,6 +18,8 @@ const AddWordForm = () => {
     antonyms: [],
     tier: 1,
     difficulty: 3,
+    study_plan: [],
+    dayIndex:{},
     content: {
       stories: [],
       mnemonics: [],
@@ -19,9 +28,23 @@ const AddWordForm = () => {
     },
   });
 
-  const [newSynonym, setNewSynonym] = useState("");
-  const [newAntonym, setNewAntonym] = useState("");
-  const [error, setError] = useState("");
+  useEffect(() => {
+    const fetchStudyPlans = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/get-study-plans");
+        if (res.data.success) {
+          setStudyPlans(res.data.data);
+        } else {
+          console.error("Error fetching study plans.");
+        }
+      } catch (error) {
+        console.error("Error fetching study plans:", error);
+      } finally {
+        setLoadingPlans(false);
+      }
+    };
+    fetchStudyPlans();
+  }, []);
 
   const handleInputChange = (path, value) => {
     setFormData((prev) => {
@@ -44,7 +67,6 @@ const AddWordForm = () => {
           current = current[key];
         }
       });
-
       return updated;
     });
   };
@@ -108,6 +130,8 @@ const AddWordForm = () => {
         definition: "",
         synonyms: [],
         antonyms: [],
+        study_plan: [],
+        dayIndex :{},
         tier: 1,
         difficulty: 3,
         content: {
@@ -141,6 +165,62 @@ const AddWordForm = () => {
           />
         </div>
 
+        <div className="addwordform-form-group">
+          <label>Study Plans:</label>
+          {loadingPlans ? (
+            <p>Loading study plans...</p>
+          ) : (
+            <div className="study-plan-buttons">
+              {studyPlans.map((plan) => {
+                const isSelected = formData.study_plan.includes(plan._id);
+
+                return (
+                  <button
+                    type="button"
+                    key={plan._id}
+                    className={`plan-button ${isSelected ? "selected" : ""}`}
+                    onClick={() => {
+                      const updatedPlans = isSelected
+                        ? formData.study_plan.filter((id) => id !== plan._id)
+                        : [...formData.study_plan, plan._id];
+
+                      handleInputChange("study_plan", updatedPlans);
+                    }}
+                  >
+                    {isSelected && <span className="tick">✅</span>}
+                    {plan.name || `Plan ${plan._id}`}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+        <div className="addwordform-form-group">
+        {formData.study_plan.map((planId) => {
+          const plan = studyPlans.find((p) => p._id === planId);
+          return (
+            <div key={planId} className="day-index-input">
+              <label>
+                {plan?.name || `Plan ${planId}`} - Day:
+                <input
+                  type="number"
+                  min="1"
+                  value={formData.dayIndex[planId] || ""}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      dayIndex: {
+                        ...prev.dayIndex,
+                        [planId]: parseInt(e.target.value) || "",
+                      },
+                    }))
+                  }
+                />
+              </label>
+            </div>
+          );
+        })}
+      </div>
         <div className="addwordform-form-group">
           <label>Definition:</label>
           <textarea

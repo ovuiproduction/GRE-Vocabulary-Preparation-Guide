@@ -15,6 +15,8 @@ const AddQuestionForm = () => {
   const [difficulty, setDifficulty] = useState("medium");
   const [loading, setLoading] = useState(false);
 
+  const [signal,setSignal] = useState("");
+ 
   const [options, setOptions] = useState([]);
 
 
@@ -56,8 +58,10 @@ const AddQuestionForm = () => {
     }
   };
 
-  const handleQuestionSubmit = async (e) => {
-    e.preventDefault();
+  const handleQuestionSubmit = async (flag) => {
+    let endpoint = "add-question";
+    if(flag == "AddUpdate") endpoint = "add-question-and-update-test";
+    setSignal(endpoint);
     if (!selectedStudyPlan || !selectedWord || !questionText || !correctAnswer) {
       alert("Please fill all required fields!");
       return;
@@ -65,7 +69,7 @@ const AddQuestionForm = () => {
 
     setLoading(true);
     try {
-      await axios.post("http://localhost:5000/admin/add-question", {
+      await axios.post(`http://localhost:5000/admin/${endpoint}`, {
         word_id: selectedWord,
         question_type: questionType,
         question: questionText,
@@ -92,7 +96,7 @@ const AddQuestionForm = () => {
   return (
     <div className="admin-panel">
       <h2>Add New Question</h2>
-      <form onSubmit={handleQuestionSubmit} className="admin-form">
+      <form className="admin-form">
         <div className="form-group">
           <label>Study Plan:</label>
           <select
@@ -217,8 +221,11 @@ const AddQuestionForm = () => {
           </select>
         </div>
 
-        <button type="submit" className="submit-btn" disabled={loading}>
-          {loading ? "Adding..." : "Add Question"}
+        <button onClick={()=>handleQuestionSubmit("Add")} type="button" className="submit-btn" disabled={loading}>
+          {(loading && signal == "Add") ? "Adding..." : "Add Question"}
+        </button>
+        <button onClick={()=>handleQuestionSubmit("AddUpdate")} type="button" className="submit-btn" disabled={loading}>
+          {(loading && signal == "AddUpdate") ? "Adding..." : "Add Question & Update Test"}
         </button>
       </form>
     </div>

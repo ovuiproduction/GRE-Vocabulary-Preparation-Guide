@@ -1,12 +1,12 @@
 import React, { useState } from "react";
+import { Link } from "react-router";
 import "../css/CoverPage.css";
 import { FaCheck, FaGamepad, FaBrain, FaClipboardCheck } from "react-icons/fa";
-import AuthComponents from '../components/AuthComponent';
+import AuthComponents from "../components/AuthComponent";
 
 const { AuthComponentUser } = AuthComponents;
 
 export default function CoverPage() {
-
   const [showAuthUser, setShowAuthUser] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [featureCards] = useState([
@@ -56,7 +56,7 @@ export default function CoverPage() {
           </h1>
           <button
             className="coverpage-cta-button coverpage-ripple"
-            onClick={()=>setShowAuthUser(true)}
+            onClick={() => setShowAuthUser(true)}
           >
             Start Learning Now <span className="coverpage-cta-arrow">→</span>
           </button>
@@ -84,6 +84,11 @@ export default function CoverPage() {
           ))}
         </div>
       </section>
+      <footer className="cover-page-footer">
+        <a href="/admin" target="_blank">
+          Admin Panel
+        </a>
+      </footer>
     </div>
   );
 }

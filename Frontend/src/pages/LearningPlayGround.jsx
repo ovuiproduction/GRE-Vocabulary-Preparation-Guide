@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../css/LearningPlayground.css";
 
@@ -27,12 +26,27 @@ const LearningPlayground = () => {
 
   const [userData, setUserData] = useState(null);
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUserData(JSON.parse(storedUser));
-    }
+    const fetchUser = async () => {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const user = JSON.parse(storedUser);
+        setUserData(user); // initial render
+  
+        try {
+          const res = await axios.get(`http://localhost:5000/user/${user._id}`);
+          if (res.data) {
+            setUserData(res.data);
+            localStorage.setItem("user", JSON.stringify(res.data)); // update localStorage if you still want to use it
+          }
+        } catch (err) {
+          console.error("Failed to fetch updated user data", err);
+        }
+      }
+    };
+  
+    fetchUser();
   }, []);
-
+  
   useEffect(() => {
     axios.get(`http://localhost:5000/study-plan/${studyPlanId}`).then((res) => {
       setStudyPlan(res.data);

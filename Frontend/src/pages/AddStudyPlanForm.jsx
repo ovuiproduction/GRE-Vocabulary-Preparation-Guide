@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState} from 'react';
 import axios from 'axios';
 
 import "../css/study_plan.css";
@@ -20,24 +20,24 @@ const AddStudyPlanForm = () => {
     word_list: []
   });
 
-  const [words, setWords] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  // const [words, setWords] = useState([]);
+  // const [loading, setLoading] = useState(true);
+  // const [error, setError] = useState('');
 
   // Fetch all words for selection
-  useEffect(() => {
-    const fetchWords = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/get-words');
-        setWords(response.data);
-        setLoading(false);
-      } catch (err) {
-        setError('Failed to load words');
-        setLoading(false);
-      }
-    };
-    fetchWords();
-  }, []);
+  // useEffect(() => {
+  //   const fetchWords = async () => {
+  //     try {
+  //       const response = await axios.get('http://localhost:5000/get-words');
+  //       setWords(response.data);
+  //       setLoading(false);
+  //     } catch (err) {
+  //       setError('Failed to load words');
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchWords();
+  // }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -63,14 +63,14 @@ const AddStudyPlanForm = () => {
     }));
   };
 
-  const handleWordSelect = (wordId) => {
-    setFormData(prev => ({
-      ...prev,
-      word_list: prev.word_list.includes(wordId)
-        ? prev.word_list.filter(id => id !== wordId)
-        : [...prev.word_list, wordId]
-    }));
-  };
+  // const handleWordSelect = (wordId) => {
+  //   setFormData(prev => ({
+  //     ...prev,
+  //     word_list: prev.word_list.includes(wordId)
+  //       ? prev.word_list.filter(id => id !== wordId)
+  //       : [...prev.word_list, wordId]
+  //   }));
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -88,8 +88,8 @@ const AddStudyPlanForm = () => {
     }
   };
 
-  if (loading) return <div>Loading words...</div>;
-  if (error) return <div>Error: {error}</div>;
+  // if (loading) return <div>Loading words...</div>;
+  // if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="admin-form">
@@ -190,28 +190,6 @@ const AddStudyPlanForm = () => {
             </div>
           </div>
         </div>
-
-        {/* Word Selection */}
-        <div className="word-selection">
-          <h3>Select Words ({formData.word_list.length} selected)</h3>
-          <div className="word-grid">
-            {words.map(word => (
-              <div 
-                key={word._id}
-                className={`word-card ${formData.word_list.includes(word._id) ? 'selected' : ''}`}
-                onClick={() => handleWordSelect(word._id)}
-              >
-                <h4>{word.word}</h4>
-                <p>{word.definition}</p>
-                <div className="word-meta">
-                  <span>Tier {word.tier}</span>
-                  <span>Difficulty: {word.difficulty}/5</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
         <button type="submit" className="submit-btn">
           Create Study Plan
         </button>

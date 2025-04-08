@@ -236,3 +236,19 @@ body, html {
   transform: translateX(5px) rotate(-45deg);
 }
 
+
+.cover-page-footer{
+  background-color:#f8f9fa;
+  padding:1rem;
+  box-sizing: border-box;
+}
+
+.cover-page-footer a{
+  text-decoration: none;
+  color:gray;
+}
+
+.cover-page-footer a:hover{
+  color: #444;
+}
+
