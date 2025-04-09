@@ -3,10 +3,16 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import "../css/LearningPlayground.css";
 
+import DailyTestCard from "../components/DailyTestCard";
+
 const LearningPlayground = () => {
   const { studyPlanId } = useParams();
   const [studyPlan, setStudyPlan] = useState(null);
   const [selectedDay, setSelectedDay] = useState(1);
+
+  const [learnedWords, setLearnedWords] = useState();
+  const [remainingWords, setRemainingWords] = useState();
+  const [totalWords, setTotalWords] = useState();
 
   const handleWordForest = () => {
     if (studyPlanId && selectedDay) {
@@ -14,39 +20,68 @@ const LearningPlayground = () => {
     }
   };
 
-  const handleDailyTest = () => {
-    if (studyPlanId && selectedDay) {
-      window.open(`/daily-test/${studyPlanId}/day/${selectedDay}`);
-    }
-  };
-
-  const handleDailyPractice = () => {
-   
-  };
+  const handleDailyPractice = () => {};
 
   const [userData, setUserData] = useState(null);
+
   useEffect(() => {
     const fetchUser = async () => {
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
         const user = JSON.parse(storedUser);
-        setUserData(user); // initial render
-  
+        setUserData(user);
         try {
           const res = await axios.get(`http://localhost:5000/user/${user._id}`);
           if (res.data) {
             setUserData(res.data);
-            localStorage.setItem("user", JSON.stringify(res.data)); // update localStorage if you still want to use it
+            localStorage.setItem("user", JSON.stringify(res.data)); // keep localStorage up to date
           }
         } catch (err) {
           console.error("Failed to fetch updated user data", err);
         }
       }
     };
-  
+
     fetchUser();
+
+    const handleFocus = () => {
+      fetchUser();
+    };
+
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
   }, []);
-  
+
+  useEffect(() => {
+    const fetchWordStats = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem("user"));
+        const res = await axios.get(
+          `http://localhost:5000/word-stats/${user._id}/${user.study_plan}/${selectedDay}`
+        );
+        setLearnedWords(res.data.learned);
+        setRemainingWords(res.data.remaining);
+        setTotalWords(res.data.totalWords);
+      } catch (err) {
+        console.error("Failed to fetch word stats", err);
+      }
+    };
+    fetchWordStats();
+
+    const handleFocus = () => {
+      fetchWordStats();
+    };
+
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, [selectedDay]);
+
   useEffect(() => {
     axios.get(`http://localhost:5000/study-plan/${studyPlanId}`).then((res) => {
       setStudyPlan(res.data);
@@ -90,7 +125,6 @@ const LearningPlayground = () => {
       </header>
 
       <div className="learning-playground-main-content">
-        {/* Left Sidebar - Days Navigation */}
         <nav className="learning-playground-sidebar">
           <div className="learning-playground-sidebar-inner">
             <h3 className="learning-playground-sidebar-title">
@@ -127,15 +161,36 @@ const LearningPlayground = () => {
           </div>
 
           <div className="learning-playground-word-list">
-            <div className="learning-playground-word-card">
-              <div className="learning-playground-word-content">
-                <h3 className="learning-playground-word-title">Words</h3>
-                <button
-                  className="learning-playground-learn-button"
-                  onClick={handleWordForest}
-                >
-                  Start Learning
-                </button>
+            <div className="learning-playground-word-list">
+              <div className="learning-playground-word-card">
+                <div className="learning-playground-word-content">
+                  <h3 className="learning-playground-word-title">Words</h3>
+                  <p
+                  className="learning-playground-percentage">
+                    {Math.round((learnedWords / totalWords) * 100) || 0}%
+                  </p>
+
+                  <div className="learning-playground-progress-container">
+                    <div
+                      className="learning-playground-progress-bar"
+                      style={{
+                        width:
+                          totalWords === 0
+                            ? "0%"
+                            : `${Math.round(
+                                (learnedWords / totalWords) * 100
+                              )}%`,
+                      }}
+                    ></div>
+                  </div>
+
+                  <button
+                    className="learning-playground-learn-button"
+                    onClick={handleWordForest}
+                  >
+                    Start Learning
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -150,18 +205,7 @@ const LearningPlayground = () => {
                 </button>
               </div>
             </div>
-
-            <div className="learning-playground-word-card">
-              <div className="learning-playground-word-content">
-                <h3 className="learning-playground-word-title">Daily Test</h3>
-                <button
-                  className="learning-playground-learn-button"
-                  onClick={handleDailyTest}
-                >
-                  Start Test
-                </button>
-              </div>
-            </div>
+            { userData && selectedDay && studyPlanId && <DailyTestCard userData={userData} selectedDay={selectedDay} studyPlanId={studyPlanId} />}
           </div>
         </main>
       </div>

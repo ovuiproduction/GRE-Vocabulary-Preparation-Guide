@@ -28,7 +28,6 @@ app.use(express.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
-
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const storage = multer.diskStorage({
@@ -45,7 +44,6 @@ mongoose
   .then(() => console.log("Connected to database"))
   .catch((err) => console.error("Database connection error:", err));
 
-
 app.get("/", (req, res) => {
   res.send("This is server");
 });
@@ -53,8 +51,7 @@ app.get("/", (req, res) => {
 app.use("/admin", adminRoutes);
 app.use("/auth/user", authRoutes);
 
-
-app.get("/user/:id",async (req,res)=>{
+app.get("/user/:id", async (req, res) => {
   const user = await users.findById(req.params.id);
   res.json(user);
 });
@@ -70,7 +67,6 @@ app.post("/upload-media", upload.single("file"), (req, res) => {
   }`;
   res.json({ fileUrl });
 });
-
 
 // Get all words for selection
 app.get("/get-words", async (req, res) => {
@@ -105,13 +101,13 @@ app.get("/get-study-plans", async (req, res) => {
 app.patch("/update-study-plan", async (req, res) => {
   try {
     const { userId, planId } = req.body;
-   
+
     // Validate plan exists
     const planExists = await StudyPlan.exists({ _id: planId });
     if (!planExists) {
       return res.status(400).json({ message: "Invalid study plan" });
     }
-   
+
     // Update user document
     const updatedUser = await users.findByIdAndUpdate(
       userId,
@@ -168,7 +164,6 @@ app.get("/get-words/:studyPlanId/day/:dayIndex", async (req, res) => {
   }
 });
 
-
 // app.put(
 //   "/update-learning-progress/:userId/:studyPlanId/day/:dayIndex/:wordId",
 //   async (req, res) => {
@@ -220,7 +215,9 @@ app.put(
       }
 
       // Step 3: Check if all words for the day are learned
-      const studyPlan = await StudyPlan.findById(studyPlanId).populate("word_list");
+      const studyPlan = await StudyPlan.findById(studyPlanId).populate(
+        "word_list"
+      );
 
       if (!studyPlan || !studyPlan.word_list) {
         return res.status(400).json({ error: "Study plan or words not found" });
@@ -233,7 +230,9 @@ app.put(
       const learnedWordIds = dayProgress.completedWords.map((id) => String(id));
       const dailyWordIds = dailyWords.map((word) => String(word._id));
 
-      const allCompleted = dailyWordIds.every((id) => learnedWordIds.includes(id));
+      const allCompleted = dailyWordIds.every((id) =>
+        learnedWordIds.includes(id)
+      );
 
       if (allCompleted) {
         dayProgress.completedOnDay = true;
@@ -243,7 +242,9 @@ app.put(
       await dayProgress.save();
 
       // Step 4: Update streak
-      await axios.put(`http://localhost:5000/update-streak/${userId}/${studyPlanId}`);
+      await axios.put(
+        `http://localhost:5000/update-streak/${userId}/${studyPlanId}`
+      );
 
       res.status(200).json({ message: "Progress updated successfully" });
     } catch (error) {
@@ -252,8 +253,6 @@ app.put(
     }
   }
 );
-
-
 
 app.get("/get-learning-progress/:userId/:studyPlanId", async (req, res) => {
   try {
@@ -459,7 +458,6 @@ function countHighScoreStreak(scores, minScore) {
   return count;
 }
 
-
 app.post("/start-learning", async (req, res) => {
   try {
     const { userId, studyPlanId } = req.body;
@@ -473,7 +471,7 @@ app.post("/start-learning", async (req, res) => {
     // 1. Update User startDate
     await users.findByIdAndUpdate(userId, {
       startDate: today,
-      started_learning :true
+      started_learning: true,
     });
 
     // 2. Create or update StreakTracker
@@ -539,19 +537,19 @@ app.post("/start-learning", async (req, res) => {
 //         studyPlanId,
 //         dayIndex: day,
 //       });
-    
+
 //       if (!progress) {
 //         break;
 //       }
-    
+
 //       const assignedWordsDocs = await Word.find({
 //         [`dayIndex.${studyPlanId}`]: day,
 //       }).select("_id");
-      
+
 //       const assignedWordIds = assignedWordsDocs.map(w => w._id.toString());
-      
+
 //       const completed = (progress.completedWords || []).map(id => id.toString());
-      
+
 //       const allCompleted = assignedWordIds.every(wordId =>
 //         completed.includes(wordId)
 //       );
@@ -561,10 +559,9 @@ app.post("/start-learning", async (req, res) => {
 //       if (!allCompleted) {
 //         break;
 //       }
-    
+
 //       currentStreak++;
 //     }
-     
 
 //     user.streak = currentStreak;
 //     await user.save();
@@ -576,6 +573,31 @@ app.post("/start-learning", async (req, res) => {
 //   }
 // });
 
+app.get("/word-stats/:userId/:studyPlanId/:day", async (req, res) => {
+  const { userId, studyPlanId, day } = req.params;
+
+  const progress = await DayWiseProgress.findOne({
+    user_id: userId,
+    studyPlanId,
+    dayIndex: day,
+  });
+
+  const assignedWordsDocs = await Word.find({
+    [`dayIndex.${studyPlanId}`]: day,
+  }).select("word");
+
+  let learnedCount = 0;
+  if(progress){
+    learnedCount = progress?.completedWords.length;
+  }
+  const totalAssigned = assignedWordsDocs.length;
+
+  res.json({
+    learned: learnedCount,
+    totalWords: totalAssigned,
+    remaining: totalAssigned - learnedCount,
+  });
+});
 
 app.put("/update-streak/:userId/:studyPlanId", async (req, res) => {
   const { userId, studyPlanId } = req.params;
@@ -593,8 +615,7 @@ app.put("/update-streak/:userId/:studyPlanId", async (req, res) => {
 
     const today = new Date();
     const startDate = new Date(user.startDate);
-    const dayDiff =
-      Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
+    const dayDiff = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
 
     const totalDays = Math.min(dayDiff, plan.duration_days);
 
@@ -614,10 +635,12 @@ app.put("/update-streak/:userId/:studyPlanId", async (req, res) => {
         [`dayIndex.${studyPlanId}`]: day,
       }).select("_id");
 
-      const assignedWordIds = assignedWordsDocs.map(w => w._id.toString());
-      const completed = (progress.completedWords || []).map(id => id.toString());
+      const assignedWordIds = assignedWordsDocs.map((w) => w._id.toString());
+      const completed = (progress.completedWords || []).map((id) =>
+        id.toString()
+      );
 
-      const allCompleted = assignedWordIds.every(wordId =>
+      const allCompleted = assignedWordIds.every((wordId) =>
         completed.includes(wordId)
       );
 
@@ -657,6 +680,32 @@ app.put("/update-streak/:userId/:studyPlanId", async (req, res) => {
   }
 });
 
+
+
+app.get("/test-track-status", async (req, res) => {
+  const { userId, studyPlanId, testId } = req.query;
+  try {
+    const track = await TestTrack.findOne({
+      user_id: userId,
+      studyPlan: studyPlanId,
+      test_id: testId,
+    });
+
+    if (track) {
+      res.json({
+        attempted: true,
+        score: track.score,
+        correct_answers: track.correct_answers,
+        total_questions: track.total_questions,
+        attempted_at: track.attempted_at,
+      });
+    } else {
+      res.json({ attempted: false });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch test track info" });
+  }
+});
 
 app.listen(port, () => {
   console.log(`Server running on ${port}`);

@@ -19,6 +19,9 @@ import AddWordForm from './pages/AddWordForm';
 import AddQuestionForm from './pages/AddQuestionForm';
 import AddTestForm from './pages/AddTestForm';
 
+
+import LearningJourney from './components/LearningJourney';
+
 function App() {
   return (
     <Router>
@@ -41,6 +44,7 @@ function App() {
 
         <Route path="/daily-test/:studyPlanId/day/:selectedDay" element={<TestPage />} />
 
+        <Route path="/learning-journey" element={<LearningJourney />} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

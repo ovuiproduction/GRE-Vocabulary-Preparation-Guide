@@ -21,7 +21,6 @@ export default function Home() {
 
   const navigate = useNavigate();
 
-
   useEffect(() => {
     const fetchUser = async () => {
       const storedUser = localStorage.getItem("user");
@@ -39,27 +38,26 @@ export default function Home() {
         }
       }
     };
-  
+
     fetchUser();
-  
+
     const handleFocus = () => {
       fetchUser();
     };
-  
+
     window.addEventListener("focus", handleFocus);
-  
+
     return () => {
       window.removeEventListener("focus", handleFocus);
     };
   }, []);
-  
 
   // const handleStartLearning = async () => {
   //   if (!userData.study_plan) {
   //     alert("No study plan selected!");
   //     return;
   //   }
-  
+
   //   try {
   //     const response = await fetch("http://localhost:5000/start-learning", {
   //       method: "POST",
@@ -71,7 +69,7 @@ export default function Home() {
   //         studyPlanId: userData.study_plan,
   //       }),
   //     });
-  
+
   //     const data = await response.json();
   //     if (response.ok) {
   //       // Redirect to study page
@@ -84,14 +82,13 @@ export default function Home() {
   //     alert("Something went wrong");
   //   }
   // };
-  
 
   const handleStartLearning = async () => {
     if (!userData.study_plan) {
       alert("No study plan selected!");
       return;
     }
-  
+
     // Only call backend if not started yet
     if (!userData.started_learning) {
       try {
@@ -105,14 +102,14 @@ export default function Home() {
             studyPlanId: userData.study_plan,
           }),
         });
-  
+
         const data = await response.json();
         if (response.ok) {
           // Update localStorage and state
           const updatedUser = { ...userData, started_learning: true };
           localStorage.setItem("user", JSON.stringify(updatedUser));
           setUserData(updatedUser);
-  
+
           window.open(`/study-plan/${userData.study_plan}`, "_blank");
         } else {
           alert(data.error || "Failed to start learning");
@@ -126,7 +123,6 @@ export default function Home() {
       window.open(`/study-plan/${userData.study_plan}`, "_blank");
     }
   };
-  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -190,6 +186,10 @@ export default function Home() {
     navigate("/");
   };
 
+  const handleNavigateProgress = () => {
+    window.open("/learning-journey");
+  };
+
   return (
     <div className="home-container">
       <header className="home-header">
@@ -204,7 +204,7 @@ export default function Home() {
             onClick={() => setShowDropdown(!showDropdown)}
           >
             <div className="home-profile-circle">
-              {userData && (<>{userData.name[0]}</>)}
+              {userData && <>{userData.name[0]}</>}
             </div>
           </button>
 
@@ -213,13 +213,21 @@ export default function Home() {
               <button className="home-dropdown-item">
                 <FaBook /> My Study Plan
               </button>
-              <button className="home-dropdown-item">
+              <button
+                onClick={handleNavigateProgress}
+                className="home-dropdown-item"
+              >
                 <FaChartLine /> Progress
               </button>
               <button className="home-dropdown-item">
                 <FaTrophy /> Achievements
               </button>
-              <button onClick={handleLogOut} className="home-dropdown-item home-logout">Logout</button>
+              <button
+                onClick={handleLogOut}
+                className="home-dropdown-item home-logout"
+              >
+                Logout
+              </button>
             </div>
           )}
         </div>
