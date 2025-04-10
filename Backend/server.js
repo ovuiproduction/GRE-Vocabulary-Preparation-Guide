@@ -393,42 +393,6 @@ app.post("/submit-test", async (req, res) => {
   }
 });
 
-// const checkAndAssignBadges = async (userId, latestScore) => {
-//   const badges = await Badge.find({
-//     "criteria.type": { $in: ["test_score", "streak"] },
-//   });
-
-//   const user = await users.findById(userId);
-//   const pastTests = await TestTrack.find({ userId }).sort({ date: 1 }); // sorted by time
-
-//   const userScores = pastTests.map((t) => t.score); // assuming `score` is out of 100
-
-//   const qualifiedBadges = [];
-
-//   for (const badge of badges) {
-//     const { type, threshold } = badge.criteria;
-
-//     // Avoid duplicate assignment
-//     if (user.badges.includes(badge._id)) continue;
-
-//     if (type === "test_score" && latestScore >= threshold) {
-//       qualifiedBadges.push(badge._id);
-//     }
-
-//     if (type === "streak") {
-//       const streak = countHighScoreStreak([...userScores, latestScore], 80);
-//       if (streak >= threshold) {
-//         qualifiedBadges.push(badge._id);
-//       }
-//     }
-//   }
-
-//   if (qualifiedBadges.length > 0) {
-//     user.badges.push(...qualifiedBadges);
-//     await user.save();
-//   }
-// };
-
 
 const checkAndAssignBadges = async (userId, latestScore) => {
   const badges = await Badge.find({
