@@ -32,9 +32,28 @@ const LearningPlayground = () => {
         setUserData(user);
         try {
           const res = await axios.get(`http://localhost:5000/user/${user._id}`);
+          let userRes = res.data;
           if (res.data) {
             setUserData(res.data);
-            localStorage.setItem("user", JSON.stringify(res.data)); // keep localStorage up to date
+            localStorage.setItem("user", JSON.stringify(res.data));
+            let calculatedDay = 1;
+            if (userRes.startDate) {
+              const startDate = new Date(userRes.startDate);
+              const today = new Date();
+
+              startDate.setHours(0, 0, 0, 0);
+              today.setHours(0, 0, 0, 0);
+
+              const timeDiff = today.getTime() - startDate.getTime();
+              const daysSinceStart =
+                Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
+
+              calculatedDay = Math.max(
+                1,
+                Math.min(daysSinceStart, userRes.studyPlanDuration || 30)
+              );
+            }
+            setSelectedDay(calculatedDay);
           }
         } catch (err) {
           console.error("Failed to fetch updated user data", err);

@@ -13,7 +13,8 @@ const Question = require("../models/Question");
 const Badge = require("../models/Badge");
 
 
-const uploadPath = path.join(__dirname, "uploads");
+const uploadPath = path.join(__dirname, '..', 'uploads');
+
 if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath);
 }

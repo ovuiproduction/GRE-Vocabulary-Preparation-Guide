@@ -22,6 +22,8 @@ import AddTestForm from './pages/AddTestForm';
 
 import LearningJourney from './components/LearningJourney';
 
+import BadgesDisplay from './components/BadgesDisplay';
+
 function App() {
   return (
     <Router>
@@ -45,6 +47,8 @@ function App() {
         <Route path="/daily-test/:studyPlanId/day/:selectedDay" element={<TestPage />} />
 
         <Route path="/learning-journey" element={<LearningJourney />} />
+
+        <Route path="/user/badges" element={<BadgesDisplay />} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

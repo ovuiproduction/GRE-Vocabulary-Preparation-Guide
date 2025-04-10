@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { FiChevronLeft, FiChevronRight, FiBook, FiAward, FiCheckCircle, FiSearch } from "react-icons/fi";
+import { FiBook, FiAward, FiCheckCircle, FiSearch } from "react-icons/fi";
 import "../css/LearningJourney.css";
+import { Link } from "react-router";
+
+import ProgressLineChart from "./ProgressLineChart";
 
 const LearningJourney = () => {
   const [progressData, setProgressData] = useState([]);
@@ -40,9 +43,15 @@ const LearningJourney = () => {
     // Check for range (e.g., "5-10")
     if (input.includes("-")) {
       const [start, end] = input.split("-").map(Number);
-      if (!isNaN(start) && !isNaN(end) && start > 0 && end <= progressData.length) {
+      if (
+        !isNaN(start) &&
+        !isNaN(end) &&
+        start > 0 &&
+        end <= progressData.length
+      ) {
         const filtered = progressData.filter(
-          day => day.day >= Math.min(start, end) && day.day <= Math.max(start, end)
+          (day) =>
+            day.day >= Math.min(start, end) && day.day <= Math.max(start, end)
         );
         setFilteredData(filtered);
         return;
@@ -81,7 +90,7 @@ const LearningJourney = () => {
             `http://localhost:5000/user/${user._id}`,
             user
           );
-          
+
           setUserData(userRes);
           localStorage.setItem("user", JSON.stringify(userRes));
 
@@ -89,14 +98,18 @@ const LearningJourney = () => {
           if (userRes.startDate) {
             const startDate = new Date(userRes.startDate);
             const today = new Date();
-          
+
             startDate.setHours(0, 0, 0, 0);
             today.setHours(0, 0, 0, 0);
-            
+
             const timeDiff = today.getTime() - startDate.getTime();
-            const daysSinceStart = Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
-            
-            calculatedDay = Math.max(1, Math.min(daysSinceStart, userRes.studyPlanDuration || 30));
+            const daysSinceStart =
+              Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
+
+            calculatedDay = Math.max(
+              1,
+              Math.min(daysSinceStart, userRes.studyPlanDuration || 30)
+            );
           }
           setCurrentDay(calculatedDay);
 
@@ -119,6 +132,89 @@ const LearningJourney = () => {
     fetchUserAndPlan();
   }, []);
 
+  // useEffect(() => {
+  //   if (!userData || !studyPlan) return;
+
+  //   const fetchProgressData = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const days = studyPlan.duration_days || 30;
+  //       const progress = [];
+  //       let wordsTotal = 0;
+  //       let testsCompleted = 0;
+
+  //       for (let day = 1; day <= days; day++) {
+  //         const wordStats = await safeFetch(
+  //           `http://localhost:5000/word-stats/${userData._id}/${userData.study_plan}/${day}`,
+  //           { learned: 0 }
+  //         );
+
+  //         let testStatus = "not-attempted";
+  //         let score = 0;
+  //         let testExists = false;
+
+  //         try {
+  //           const testRes = await axios.get(
+  //             `http://localhost:5000/get-test/${userData.study_plan}/day/${day}`
+  //           );
+
+  //           if (testRes.data?.test?.[0]?._id) {
+  //             testExists = true;
+  //             const testId = testRes.data.test[0]._id;
+  //             const trackRes = await safeFetch(
+  //               `http://localhost:5000/test-track-status?userId=${userData._id}&studyPlanId=${userData.study_plan}&testId=${testId}`,
+  //               { attempted: false, score: 0 }
+  //             );
+  //             testStatus = trackRes.attempted ? "attempted" : "not-attempted";
+  //             score = trackRes.score || 0;
+  //             if (trackRes.attempted) testsCompleted++;
+  //           }
+  //         } catch (testErr) {
+  //           console.error(`Error fetching test status for day ${day}:`, testErr);
+  //         }
+
+  //         wordsTotal += wordStats.learned || 0;
+  //         const backlog = (wordStats.learned || 0) < 10 && day < currentDay;
+
+  //         progress.push({
+  //           day,
+  //           wordsLearned: wordStats.learned || 0,
+  //           testStatus,
+  //           testExists,
+  //           score,
+  //           backlog,
+  //         });
+  //       }
+
+  //       setTotalWords(wordsTotal);
+  //       setCompletedTests(testsCompleted);
+  //       setProgressData(progress);
+  //       setFilteredData(progress);
+  //       setLoading(false);
+  //     } catch (err) {
+  //       console.error("Failed to fetch progress data", err);
+  //       setError("Failed to load progress data. Displaying sample data.");
+
+  //       const sampleData = Array.from({ length: studyPlan.duration_days || 30 }, (_, i) => ({
+  //         day: i + 1,
+  //         wordsLearned: Math.floor(Math.random() * 20),
+  //         testStatus: i % 3 === 0 ? "attempted" : "not-attempted",
+  //         testExists: i % 3 === 0,
+  //         score: i % 3 === 0 ? Math.floor(Math.random() * 40) + 60 : 0,
+  //         backlog: i % 5 === 0 && i + 1 < currentDay,
+  //       }));
+
+  //       setTotalWords(sampleData.reduce((sum, day) => sum + day.wordsLearned, 0));
+  //       setCompletedTests(sampleData.filter(day => day.testStatus === "attempted").length);
+  //       setProgressData(sampleData);
+  //       setFilteredData(sampleData);
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchProgressData();
+  // }, [userData, studyPlan, currentDay]);
+
   useEffect(() => {
     if (!userData || !studyPlan) return;
 
@@ -126,49 +222,58 @@ const LearningJourney = () => {
       try {
         setLoading(true);
         const days = studyPlan.duration_days || 30;
+
+        // Fetch all word stats in one go
+        const wordStatsRes = await axios.get(
+          `http://localhost:5000/all-word-stats/${userData._id}/${userData.study_plan}`
+        );
+
+        // Filter out invalid/null day entries
+        const wordStatsMap = {};
+        (wordStatsRes.data || []).forEach((stat) => {
+          if (stat.day && !isNaN(stat.day)) {
+            wordStatsMap[stat.day] = stat;
+          }
+        });
+
+        // Fetch all test progress in one go
+        const testProgressRes = await axios.get(
+          `http://localhost:5000/all-test-progress/${userData._id}/${userData.study_plan}`
+        );
+
+        // Create test progress map: day -> data
+        const testMap = {};
+        (testProgressRes.data || []).forEach((entry) => {
+          if (entry.day && !isNaN(entry.day)) {
+            testMap[entry.day] = entry;
+          }
+        });
+
         const progress = [];
         let wordsTotal = 0;
         let testsCompleted = 0;
 
         for (let day = 1; day <= days; day++) {
-          const wordStats = await safeFetch(
-            `http://localhost:5000/word-stats/${userData._id}/${userData.study_plan}/${day}`,
-            { learned: 0 }
-          );
+          const wordStat = wordStatsMap[day] || { learned: 0, totalWords: 0 };
+          const testStat = testMap[day] || {
+            testExists: false,
+            attempted: false,
+            score: 0,
+          };
 
-          let testStatus = "not-attempted";
-          let score = 0;
-          let testExists = false;
+          const backlog = wordStat.learned < 10 && day < currentDay;
 
-          try {
-            const testRes = await axios.get(
-              `http://localhost:5000/get-test/${userData.study_plan}/day/${day}`
-            );
+          if (!wordStatsMap[day] && !testMap[day]) continue;
 
-            if (testRes.data?.test?.[0]?._id) {
-              testExists = true;
-              const testId = testRes.data.test[0]._id;
-              const trackRes = await safeFetch(
-                `http://localhost:5000/test-track-status?userId=${userData._id}&studyPlanId=${userData.study_plan}&testId=${testId}`,
-                { attempted: false, score: 0 }
-              );
-              testStatus = trackRes.attempted ? "attempted" : "not-attempted";
-              score = trackRes.score || 0;
-              if (trackRes.attempted) testsCompleted++;
-            }
-          } catch (testErr) {
-            console.error(`Error fetching test status for day ${day}:`, testErr);
-          }
-
-          wordsTotal += wordStats.learned || 0;
-          const backlog = (wordStats.learned || 0) < 10 && day < currentDay;
+          if (testStat.attempted) testsCompleted++;
+          wordsTotal += wordStat.learned;
 
           progress.push({
             day,
-            wordsLearned: wordStats.learned || 0,
-            testStatus,
-            testExists,
-            score,
+            wordsLearned: wordStat.learned,
+            testStatus: testStat.attempted ? "attempted" : "not-attempted",
+            testExists: testStat.testExists,
+            score: testStat.score || 0,
             backlog,
           });
         }
@@ -182,17 +287,22 @@ const LearningJourney = () => {
         console.error("Failed to fetch progress data", err);
         setError("Failed to load progress data. Displaying sample data.");
 
-        const sampleData = Array.from({ length: studyPlan.duration_days || 30 }, (_, i) => ({
-          day: i + 1,
-          wordsLearned: Math.floor(Math.random() * 20),
-          testStatus: i % 3 === 0 ? "attempted" : "not-attempted",
-          testExists: i % 3 === 0,
-          score: i % 3 === 0 ? Math.floor(Math.random() * 40) + 60 : 0,
-          backlog: i % 5 === 0 && i + 1 < currentDay,
-        }));
+        const sampleData = Array.from(
+          { length: studyPlan.duration_days || 30 },
+          (_, i) => ({
+            day: i + 1,
+            wordsLearned: Math.floor(Math.random() * 20),
+            testStatus: i % 3 === 0 ? "attempted" : "not-attempted",
+            testExists: i % 3 === 0,
+            score: i % 3 === 0 ? Math.floor(Math.random() * 40) + 60 : 0,
+            backlog: i % 5 === 0 && i + 1 < currentDay,
+          })
+        );
 
-        setTotalWords(sampleData.reduce((sum, day) => sum + day.wordsLearned, 0));
-        setCompletedTests(sampleData.filter(day => day.testStatus === "attempted").length);
+        setTotalWords(sampleData.reduce((sum, d) => sum + d.wordsLearned, 0));
+        setCompletedTests(
+          sampleData.filter((d) => d.testStatus === "attempted").length
+        );
         setProgressData(sampleData);
         setFilteredData(sampleData);
         setLoading(false);
@@ -212,19 +322,27 @@ const LearningJourney = () => {
   }
 
   if (error) {
-    return <div className="learning-journey-container error-message">Error: {error}</div>;
+    return (
+      <div className="learning-journey-container error-message">
+        Error: {error}
+      </div>
+    );
   }
 
   if (progressData.length === 0) {
-    return <div className="learning-journey-container">No progress data available.</div>;
+    return (
+      <div className="learning-journey-container">
+        No progress data available.
+      </div>
+    );
   }
 
   const calculateCircleProgress = (wordsLearned) => {
     const radius = 30;
     const circumference = 2 * Math.PI * radius;
-    const progress = Math.min(wordsLearned / 20, 1);
+    const progress = Math.min(wordsLearned / studyPlan.daily_new_words, 1);
     const dashOffset = circumference * (1 - progress);
-    
+
     return {
       circumference,
       dashOffset,
@@ -239,7 +357,7 @@ const LearningJourney = () => {
         <div className="header-content">
           <h1>My Learning Journey</h1>
           <p className="subtitle">Track your daily progress and achievements</p>
-          
+
           <div className="stats-container">
             <div className="stat-card">
               <FiBook className="stat-icon" />
@@ -248,7 +366,7 @@ const LearningJourney = () => {
                 <span className="stat-label">Words Learned</span>
               </div>
             </div>
-            
+
             <div className="stat-card">
               <FiAward className="stat-icon" />
               <div>
@@ -256,7 +374,7 @@ const LearningJourney = () => {
                 <span className="stat-label">Tests Completed</span>
               </div>
             </div>
-            
+
             <div className="stat-card">
               <FiCheckCircle className="stat-icon" />
               <div>
@@ -268,6 +386,14 @@ const LearningJourney = () => {
         </div>
       </header>
 
+      <div className="learning-journey-routes">
+        <p className="route-paths">
+          <span><Link to="/home">Home</Link></span>
+          <span>/</span>
+          <span>LearningJourney</span>
+        </p>
+      </div>
+
       {/* Search Bar Section */}
       <div className="search-container">
         <div className="search-bar">
@@ -277,19 +403,13 @@ const LearningJourney = () => {
             placeholder="Search by day (e.g., 5) or range (e.g., 5-10)"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+            onKeyPress={(e) => e.key === "Enter" && handleSearch()}
           />
-          <button 
-            className="search-button"
-            onClick={handleSearch}
-          >
+          <button className="search-button" onClick={handleSearch}>
             Search
           </button>
           {isSearching && (
-            <button 
-              className="reset-button"
-              onClick={resetSearch}
-            >
+            <button className="reset-button" onClick={resetSearch}>
               Reset
             </button>
           )}
@@ -301,6 +421,8 @@ const LearningJourney = () => {
         )}
       </div>
 
+    
+
       {/* Main Content */}
       <main className="journey-content">
         {filteredData.length === 0 ? (
@@ -311,21 +433,29 @@ const LearningJourney = () => {
           <>
             <div className="day-cards-grid">
               {filteredData.map((dayData) => {
-                const circleProgress = calculateCircleProgress(dayData.wordsLearned);
+                const circleProgress = calculateCircleProgress(
+                  dayData.wordsLearned
+                );
                 const isCurrentDay = dayData.day === currentDay;
-                
+
                 return (
-                  <div 
-                    key={dayData.day} 
-                    className={`day-card ${isCurrentDay ? "current-day" : ""} ${dayData.backlog ? "backlog" : ""}`}
+                  <div
+                    key={dayData.day}
+                    className={`day-card ${isCurrentDay ? "current-day" : ""} ${
+                      dayData.backlog ? "backlog" : ""
+                    }`}
                     // onClick={() => setCurrentDay(dayData.day)}
                   >
                     <div className="day-card-header">
                       <h3 className="day-number">Day {dayData.day}</h3>
-                      {dayData.backlog && <span className="backlog-tag">Behind</span>}
-                      {isCurrentDay && <span className="current-tag">Today</span>}
+                      {dayData.backlog && (
+                        <span className="backlog-tag">Behind</span>
+                      )}
+                      {isCurrentDay && (
+                        <span className="current-tag">Today</span>
+                      )}
                     </div>
-                    
+
                     <div className="progress-indicator">
                       <svg className="progress-circle" viewBox="0 0 70 70">
                         <circle
@@ -335,7 +465,9 @@ const LearningJourney = () => {
                           r="30"
                         />
                         <circle
-                          className={`progress-circle-fill ${dayData.backlog ? "backlog-fill" : ""}`}
+                          className={`progress-circle-fill ${
+                            dayData.backlog ? "backlog-fill" : ""
+                          }`}
                           cx="35"
                           cy="35"
                           r="30"
@@ -347,14 +479,24 @@ const LearningJourney = () => {
                         {circleProgress.progressPercent}%
                       </div>
                     </div>
-                    
+
                     <div className="day-stats">
                       <div className="words-stat">
-                        <span className="stat-value">{dayData.wordsLearned}</span>
+                        <span className="stat-value">
+                          {dayData.wordsLearned}
+                        </span>
                         <span className="stat-label">/20 words</span>
                       </div>
-                      
-                      <div className={`test-stat ${!dayData.testExists ? "no-test" : dayData.testStatus === "attempted" ? "completed" : "pending"}`}>
+
+                      <div
+                        className={`test-stat ${
+                          !dayData.testExists
+                            ? "no-test"
+                            : dayData.testStatus === "attempted"
+                            ? "completed"
+                            : "pending"
+                        }`}
+                      >
                         {dayData.testExists ? (
                           dayData.testStatus === "attempted" ? (
                             <>
@@ -382,6 +524,14 @@ const LearningJourney = () => {
           </>
         )}
       </main>
+      {progressData && (
+        <>
+          <h2 className="learning-journey-progress-graph-title">Words Learned</h2>
+          <main className="progress-graph">
+            {<ProgressLineChart progressData={progressData} />}
+          </main>
+          </>
+      )}
       <footer className="learning-journey-footer">Learn & Grow</footer>
     </div>
   );

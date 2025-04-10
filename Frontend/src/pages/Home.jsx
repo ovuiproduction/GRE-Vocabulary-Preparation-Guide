@@ -18,6 +18,7 @@ export default function Home() {
   const [studyPlans, setStudyPlans] = useState([]);
   const [userData, setUserData] = useState(null);
   const [fetchError, setFetchError] = useState("");
+  const [currentDay, setCurrentDay] = useState(null);
 
   const navigate = useNavigate();
 
@@ -29,9 +30,28 @@ export default function Home() {
         setUserData(user);
         try {
           const res = await axios.get(`http://localhost:5000/user/${user._id}`);
+          let userRes = res.data;
           if (res.data) {
             setUserData(res.data);
-            localStorage.setItem("user", JSON.stringify(res.data)); // keep localStorage up to date
+            localStorage.setItem("user", JSON.stringify(res.data));
+            let calculatedDay = 1;
+            if (userRes.startDate) {
+              const startDate = new Date(userRes.startDate);
+              const today = new Date();
+
+              startDate.setHours(0, 0, 0, 0);
+              today.setHours(0, 0, 0, 0);
+
+              const timeDiff = today.getTime() - startDate.getTime();
+              const daysSinceStart =
+                Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
+
+              calculatedDay = Math.max(
+                1,
+                Math.min(daysSinceStart, userRes.studyPlanDuration || 30)
+              );
+            }
+            setCurrentDay(calculatedDay);
           }
         } catch (err) {
           console.error("Failed to fetch updated user data", err);
@@ -51,37 +71,6 @@ export default function Home() {
       window.removeEventListener("focus", handleFocus);
     };
   }, []);
-
-  // const handleStartLearning = async () => {
-  //   if (!userData.study_plan) {
-  //     alert("No study plan selected!");
-  //     return;
-  //   }
-
-  //   try {
-  //     const response = await fetch("http://localhost:5000/start-learning", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         userId: userData._id,
-  //         studyPlanId: userData.study_plan,
-  //       }),
-  //     });
-
-  //     const data = await response.json();
-  //     if (response.ok) {
-  //       // Redirect to study page
-  //       window.open(`/study-plan/${userData.study_plan}`, "_blank");
-  //     } else {
-  //       alert(data.error || "Failed to start learning");
-  //     }
-  //   } catch (err) {
-  //     console.error(err);
-  //     alert("Something went wrong");
-  //   }
-  // };
 
   const handleStartLearning = async () => {
     if (!userData.study_plan) {
@@ -190,6 +179,11 @@ export default function Home() {
     window.open("/learning-journey");
   };
 
+  const handleNavigateBadges = () => {
+    navigate("/user/badges");
+  };
+
+
   return (
     <div className="home-container">
       <header className="home-header">
@@ -219,7 +213,7 @@ export default function Home() {
               >
                 <FaChartLine /> Progress
               </button>
-              <button className="home-dropdown-item">
+              <button onClick={handleNavigateBadges} className="home-dropdown-item">
                 <FaTrophy /> Achievements
               </button>
               <button
@@ -246,6 +240,7 @@ export default function Home() {
                 </p>
                 <p>Daily Goal: {userData.daily_goal} words/day</p>
                 <p>Streak: {userData.streak} days</p>
+                {currentDay && (<p>Current Day : Day - {currentDay}</p>)}
                 <button
                   onClick={handleStartLearning}
                   className="home-start-learning"

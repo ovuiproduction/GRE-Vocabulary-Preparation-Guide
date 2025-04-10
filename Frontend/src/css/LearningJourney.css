@@ -41,7 +41,7 @@
   background: linear-gradient(135deg, #082959 0%, #166088 100%);
   color: white;
   padding: 30px;
-  margin-bottom: 30px;
+  margin-bottom:1rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
@@ -447,4 +447,50 @@
   color: #7f8c8d;
   background: #f8f9fa;
   border-radius: 10px;
+}
+
+.progress-graph{
+  width:90%;
+  height:70vh;
+  margin: auto;
+  margin-bottom:2rem;
+  border:1px solid rgb(242, 242, 245);
+  padding:1rem;
+}
+
+.learning-journey-progress-graph-title{
+  background-color: rgb(242, 242, 244);
+  padding:1rem;
+  margin-bottom:1.5rem;
+}
+
+.learning-journey-routes {
+  font-family: 'Inter', sans-serif;
+  width:90%;
+  margin: auto;
+  margin-bottom: 1rem;
+}
+
+.route-paths {
+  font-size: 15px;
+  color: #6b7280; /* Tailwind Gray-500 */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.route-paths span {
+  display: flex;
+  align-items: center;
+}
+
+.route-paths a {
+  text-decoration: none;
+  color: #4f46e5; /* Tailwind Indigo-600 */
+  font-weight: 500;
+  transition: color 0.2s ease-in-out;
+}
+
+.route-paths a:hover {
+  color: #4338ca; /* Tailwind Indigo-700 */
 }

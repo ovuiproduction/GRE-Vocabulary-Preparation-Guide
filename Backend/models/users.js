@@ -24,11 +24,11 @@ const userSchema = new Schema({
       "Invalid email format",
     ],
   },
-  otp:{type:String},
+  otp: { type: String },
   study_plan: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'StudyPlan',
-    default:null
+    ref: "StudyPlan",
+    default: null,
   },
   daily_goal: {
     type: Number,
@@ -47,7 +47,7 @@ const userSchema = new Schema({
   started_learning: {
     type: Boolean,
     default: false,
-  },  
+  },
   total_points: {
     type: Number,
     default: 0,
@@ -55,8 +55,18 @@ const userSchema = new Schema({
   },
   badges: [
     {
-      type: Schema.Types.ObjectId,
-      ref: "Badge",
+      badgeId: {
+        type: Schema.Types.ObjectId,
+        ref: "Badge",
+      },
+      awardedOn: {
+        type: Date,
+      },
+      studyPlanId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "StudyPlan",
+        default: null,
+      },
     },
   ],
   activity_log: [
