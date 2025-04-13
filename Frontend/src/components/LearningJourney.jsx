@@ -6,6 +6,9 @@ import { Link } from "react-router";
 
 import ProgressLineChart from "./ProgressLineChart";
 
+const server_base_url = "https://gre-vocabulary-preparation-guide-server.onrender.com"
+
+
 const LearningJourney = () => {
   const [progressData, setProgressData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -87,7 +90,7 @@ const LearningJourney = () => {
           setUserData(user);
 
           const userRes = await safeFetch(
-            `http://localhost:5000/user/${user._id}`,
+            `${server_base_url}/user/${user._id}`,
             user
           );
 
@@ -115,7 +118,7 @@ const LearningJourney = () => {
 
           if (userRes.study_plan) {
             const studyPlanRes = await safeFetch(
-              `http://localhost:5000/study-plan/${userRes.study_plan}`,
+              `${server_base_url}/study-plan/${userRes.study_plan}`,
               { duration_days: 30 }
             );
             setStudyPlan(studyPlanRes);
@@ -132,89 +135,7 @@ const LearningJourney = () => {
     fetchUserAndPlan();
   }, []);
 
-  // useEffect(() => {
-  //   if (!userData || !studyPlan) return;
-
-  //   const fetchProgressData = async () => {
-  //     try {
-  //       setLoading(true);
-  //       const days = studyPlan.duration_days || 30;
-  //       const progress = [];
-  //       let wordsTotal = 0;
-  //       let testsCompleted = 0;
-
-  //       for (let day = 1; day <= days; day++) {
-  //         const wordStats = await safeFetch(
-  //           `http://localhost:5000/word-stats/${userData._id}/${userData.study_plan}/${day}`,
-  //           { learned: 0 }
-  //         );
-
-  //         let testStatus = "not-attempted";
-  //         let score = 0;
-  //         let testExists = false;
-
-  //         try {
-  //           const testRes = await axios.get(
-  //             `http://localhost:5000/get-test/${userData.study_plan}/day/${day}`
-  //           );
-
-  //           if (testRes.data?.test?.[0]?._id) {
-  //             testExists = true;
-  //             const testId = testRes.data.test[0]._id;
-  //             const trackRes = await safeFetch(
-  //               `http://localhost:5000/test-track-status?userId=${userData._id}&studyPlanId=${userData.study_plan}&testId=${testId}`,
-  //               { attempted: false, score: 0 }
-  //             );
-  //             testStatus = trackRes.attempted ? "attempted" : "not-attempted";
-  //             score = trackRes.score || 0;
-  //             if (trackRes.attempted) testsCompleted++;
-  //           }
-  //         } catch (testErr) {
-  //           console.error(`Error fetching test status for day ${day}:`, testErr);
-  //         }
-
-  //         wordsTotal += wordStats.learned || 0;
-  //         const backlog = (wordStats.learned || 0) < 10 && day < currentDay;
-
-  //         progress.push({
-  //           day,
-  //           wordsLearned: wordStats.learned || 0,
-  //           testStatus,
-  //           testExists,
-  //           score,
-  //           backlog,
-  //         });
-  //       }
-
-  //       setTotalWords(wordsTotal);
-  //       setCompletedTests(testsCompleted);
-  //       setProgressData(progress);
-  //       setFilteredData(progress);
-  //       setLoading(false);
-  //     } catch (err) {
-  //       console.error("Failed to fetch progress data", err);
-  //       setError("Failed to load progress data. Displaying sample data.");
-
-  //       const sampleData = Array.from({ length: studyPlan.duration_days || 30 }, (_, i) => ({
-  //         day: i + 1,
-  //         wordsLearned: Math.floor(Math.random() * 20),
-  //         testStatus: i % 3 === 0 ? "attempted" : "not-attempted",
-  //         testExists: i % 3 === 0,
-  //         score: i % 3 === 0 ? Math.floor(Math.random() * 40) + 60 : 0,
-  //         backlog: i % 5 === 0 && i + 1 < currentDay,
-  //       }));
-
-  //       setTotalWords(sampleData.reduce((sum, day) => sum + day.wordsLearned, 0));
-  //       setCompletedTests(sampleData.filter(day => day.testStatus === "attempted").length);
-  //       setProgressData(sampleData);
-  //       setFilteredData(sampleData);
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchProgressData();
-  // }, [userData, studyPlan, currentDay]);
-
+ 
   useEffect(() => {
     if (!userData || !studyPlan) return;
 
@@ -225,7 +146,7 @@ const LearningJourney = () => {
 
         // Fetch all word stats in one go
         const wordStatsRes = await axios.get(
-          `http://localhost:5000/all-word-stats/${userData._id}/${userData.study_plan}`
+          `${server_base_url}/all-word-stats/${userData._id}/${userData.study_plan}`
         );
 
         // Filter out invalid/null day entries
@@ -238,7 +159,7 @@ const LearningJourney = () => {
 
         // Fetch all test progress in one go
         const testProgressRes = await axios.get(
-          `http://localhost:5000/all-test-progress/${userData._id}/${userData.study_plan}`
+          `${server_base_url}/all-test-progress/${userData._id}/${userData.study_plan}`
         );
 
         // Create test progress map: day -> data

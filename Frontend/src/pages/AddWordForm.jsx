@@ -4,6 +4,9 @@ import { useEffect } from "react";
 
 import "../css/addwordform.css";
 
+const server_base_url = "https://gre-vocabulary-preparation-guide-server.onrender.com"
+
+
 const AddWordForm = () => {
   const [newSynonym, setNewSynonym] = useState("");
   const [newAntonym, setNewAntonym] = useState("");
@@ -31,7 +34,7 @@ const AddWordForm = () => {
   useEffect(() => {
     const fetchStudyPlans = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/get-study-plans");
+        const res = await axios.get(`${server_base_url}/get-study-plans`);
         if (res.data.success) {
           setStudyPlans(res.data.data);
         } else {
@@ -77,7 +80,7 @@ const AddWordForm = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/upload-media",
+        `${server_base_url}/upload-media`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -122,7 +125,7 @@ const AddWordForm = () => {
         },
       };
 
-      await axios.post("http://localhost:5000/admin/add-word", payload);
+      await axios.post(`${server_base_url}/admin/add-word`, payload);
 
       // Reset form PROPERLY
       setFormData({

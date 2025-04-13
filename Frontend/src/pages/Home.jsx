@@ -12,6 +12,9 @@ import { useNavigate } from "react-router-dom";
 
 import "../css/home.css";
 
+const server_base_url = "https://gre-vocabulary-preparation-guide-server.onrender.com"
+
+
 export default function Home() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -29,7 +32,7 @@ export default function Home() {
         const user = JSON.parse(storedUser);
         setUserData(user);
         try {
-          const res = await axios.get(`http://localhost:5000/user/${user._id}`);
+          const res = await axios.get(`${server_base_url}/user/${user._id}`);
           let userRes = res.data;
           if (res.data) {
             setUserData(res.data);
@@ -81,7 +84,7 @@ export default function Home() {
     // Only call backend if not started yet
     if (!userData.started_learning) {
       try {
-        const response = await fetch("http://localhost:5000/start-learning", {
+        const response = await fetch(`${server_base_url}/start-learning`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -124,7 +127,7 @@ export default function Home() {
         }
 
         const plansRes = await axios.get(
-          "http://localhost:5000/get-study-plans"
+          `${server_base_url}/get-study-plans`
         );
         setStudyPlans(plansRes.data.data);
       } catch (err) {
@@ -140,7 +143,7 @@ export default function Home() {
       const user = JSON.parse(localStorage.getItem("user"));
 
       const response = await axios.patch(
-        "http://localhost:5000/update-study-plan",
+        `${server_base_url}/update-study-plan`,
         {
           userId: user._id,
           planId: planId,

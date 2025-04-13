@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../css/AddTestForm.css";
 
+const server_base_url = "https://gre-vocabulary-preparation-guide-server.onrender.com"
+
+
 const AddTestForm = () => {
   const [studyPlans, setStudyPlans] = useState([]);
   const [selectedStudyPlan, setSelectedStudyPlan] = useState("");
@@ -20,7 +23,7 @@ const AddTestForm = () => {
 
   const fetchStudyPlans = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/get-study-plans");
+      const res = await axios.get(`${server_base_url}/get-study-plans`);
       setStudyPlans(res.data.data);
     } catch (error) {
       console.error("Error fetching study plans:", error);
@@ -31,7 +34,7 @@ const AddTestForm = () => {
     if (!selectedStudyPlan || !dayIndex) return;
     try {
       setFlag(true);
-      const res = await axios.get(`http://localhost:5000/get-questions/study-plan/${selectedStudyPlan}/day/${dayIndex}`);
+      const res = await axios.get(`${server_base_url}/get-questions/study-plan/${selectedStudyPlan}/day/${dayIndex}`);
       setQuestions(res.data.questions);
     } catch (error) {
       console.error("Error fetching questions:", error);
@@ -47,7 +50,7 @@ const AddTestForm = () => {
 
     setLoading(true);
     try {
-      await axios.post("http://localhost:5000/admin/add-test", {
+      await axios.post(`${server_base_url}/admin/add-test`, {
         studyPlanId: selectedStudyPlan,
         day: dayIndex,
         questions: selectedQuestions,

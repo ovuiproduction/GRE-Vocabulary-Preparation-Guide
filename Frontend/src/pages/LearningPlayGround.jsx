@@ -5,6 +5,9 @@ import "../css/LearningPlayground.css";
 
 import DailyTestCard from "../components/DailyTestCard";
 
+const server_base_url = "https://gre-vocabulary-preparation-guide-server.onrender.com"
+
+
 const LearningPlayground = () => {
   const { studyPlanId } = useParams();
   const [studyPlan, setStudyPlan] = useState(null);
@@ -31,7 +34,7 @@ const LearningPlayground = () => {
         const user = JSON.parse(storedUser);
         setUserData(user);
         try {
-          const res = await axios.get(`http://localhost:5000/user/${user._id}`);
+          const res = await axios.get(`${server_base_url}/user/${user._id}`);
           let userRes = res.data;
           if (res.data) {
             setUserData(res.data);
@@ -79,7 +82,7 @@ const LearningPlayground = () => {
       try {
         const user = JSON.parse(localStorage.getItem("user"));
         const res = await axios.get(
-          `http://localhost:5000/word-stats/${user._id}/${user.study_plan}/${selectedDay}`
+          `${server_base_url}/word-stats/${user._id}/${user.study_plan}/${selectedDay}`
         );
         setLearnedWords(res.data.learned);
         setRemainingWords(res.data.remaining);
@@ -102,7 +105,7 @@ const LearningPlayground = () => {
   }, [selectedDay]);
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/study-plan/${studyPlanId}`).then((res) => {
+    axios.get(`${server_base_url}/study-plan/${studyPlanId}`).then((res) => {
       setStudyPlan(res.data);
       console.log(res.data);
     });

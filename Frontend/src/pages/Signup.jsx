@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
+const server_base_url = "https://gre-vocabulary-preparation-guide-server.onrender.com"
+
+
 export default function Signup({ setIsLogin }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -12,7 +15,7 @@ export default function Signup({ setIsLogin }) {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:5000/auth/user/signup", {
+      const response = await fetch(`${server_base_url}/auth/user/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

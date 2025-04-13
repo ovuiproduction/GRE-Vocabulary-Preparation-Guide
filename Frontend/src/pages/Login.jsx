@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "../css/auth.css";
 
+const server_base_url = "https://gre-vocabulary-preparation-guide-server.onrender.com"
+
+
 export default function Login({setIsLogin}) {
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
@@ -17,7 +20,7 @@ export default function Login({setIsLogin}) {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/auth/user/request-otp", {
+      const response = await fetch(`${server_base_url}/auth/user/request-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -43,7 +46,7 @@ export default function Login({setIsLogin}) {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/auth/user/verify-otp", {
+      const response = await fetch(`${server_base_url}/auth/user/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp }),

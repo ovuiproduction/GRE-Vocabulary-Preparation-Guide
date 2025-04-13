@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import axios from "axios";
 import "../css/AddBadgeForm.css";
 
+const server_base_url = "https://gre-vocabulary-preparation-guide-server.onrender.com"
+
+
 const AddBadgeForm = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -28,7 +31,7 @@ const AddBadgeForm = () => {
     );
 
     try {
-      await axios.post("http://localhost:5000/admin/add-badge", fd);
+      await axios.post(`${server_base_url}/admin/add-badge`, fd);
       setShowToast(true);
 
       // Reset form after success

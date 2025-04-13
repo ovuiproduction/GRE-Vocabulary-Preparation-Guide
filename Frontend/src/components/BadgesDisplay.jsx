@@ -4,6 +4,8 @@ import { FiAward, FiX, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { Link } from "react-router";
 import "../css/BadgesDisplay.css";
 
+const server_base_url = "https://gre-vocabulary-preparation-guide-server.onrender.com"
+
 const BadgesDisplay = () => {
   const [badges, setBadges] = useState([]);
   const [userBadges, setUserBadges] = useState([]);
@@ -25,17 +27,17 @@ const BadgesDisplay = () => {
         const user = JSON.parse(storedUser);
 
         // Fetch all available badges
-        const badgesRes = await axios.get("http://localhost:5000/get/badges");
+        const badgesRes = await axios.get(`${server_base_url}/get/badges`);
         setBadges(badgesRes.data);
 
         // Fetch user's earned badges
         const userRes = await axios.get(
-          `http://localhost:5000/user/${user._id}`
+          `${server_base_url}/user/${user._id}`
         );
         setUserBadges(userRes.data.badges || []);
         if (userRes.data.study_plan) {
           const studyPlanRes = await axios.get(
-            `http://localhost:5000/study-plan/${userRes.data.study_plan}`
+            `${server_base_url}/study-plan/${userRes.data.study_plan}`
           );
           setStudyPlan(studyPlanRes.data);
         }

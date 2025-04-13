@@ -3,6 +3,9 @@ import axios from 'axios';
 
 import "../css/study_plan.css";
 
+const server_base_url = "https://gre-vocabulary-preparation-guide-server.onrender.com"
+
+
 const AddStudyPlanForm = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -20,24 +23,7 @@ const AddStudyPlanForm = () => {
     word_list: []
   });
 
-  // const [words, setWords] = useState([]);
-  // const [loading, setLoading] = useState(true);
-  // const [error, setError] = useState('');
 
-  // Fetch all words for selection
-  // useEffect(() => {
-  //   const fetchWords = async () => {
-  //     try {
-  //       const response = await axios.get('http://localhost:5000/get-words');
-  //       setWords(response.data);
-  //       setLoading(false);
-  //     } catch (err) {
-  //       setError('Failed to load words');
-  //       setLoading(false);
-  //     }
-  //   };
-  //   fetchWords();
-  // }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -63,19 +49,11 @@ const AddStudyPlanForm = () => {
     }));
   };
 
-  // const handleWordSelect = (wordId) => {
-  //   setFormData(prev => ({
-  //     ...prev,
-  //     word_list: prev.word_list.includes(wordId)
-  //       ? prev.word_list.filter(id => id !== wordId)
-  //       : [...prev.word_list, wordId]
-  //   }));
-  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/admin/add-study-plan', formData);
+      await axios.post(`${server_base_url}/admin/add-study-plan`, formData);
       alert('Study plan created successfully!');
       // Reset form
       setFormData({

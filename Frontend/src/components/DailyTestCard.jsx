@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+const server_base_url = "https://gre-vocabulary-preparation-guide-server.onrender.com"
+
 const DailyTestCard = ({ userData,selectedDay,studyPlanId }) => {
   const [testStatus, setTestStatus] = useState("loading"); // loading, not-attempted, attempted
   const [scoreData, setScoreData] = useState(null);
@@ -10,7 +12,7 @@ const DailyTestCard = ({ userData,selectedDay,studyPlanId }) => {
       try {
      
         const resTest = await axios.get(
-          `http://localhost:5000/get-test/${studyPlanId}/day/${selectedDay}`
+          `${server_base_url}/get-test/${studyPlanId}/day/${selectedDay}`
         );
 
         const testId = resTest.data?.test?.[0]?._id;
@@ -21,7 +23,7 @@ const DailyTestCard = ({ userData,selectedDay,studyPlanId }) => {
         }
 
         const resTrack = await axios.get(
-          `http://localhost:5000/test-track-status?userId=${userData._id}&studyPlanId=${studyPlanId}&testId=${testId}`
+          `${server_base_url}/test-track-status?userId=${userData._id}&studyPlanId=${studyPlanId}&testId=${testId}`
         );
 
         if (resTrack.data?.attempted) {

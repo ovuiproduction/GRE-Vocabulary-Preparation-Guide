@@ -3,6 +3,9 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import "../css/WordForest.css";
 
+const server_base_url = "https://gre-vocabulary-preparation-guide-server.onrender.com"
+
+
 const WordForest = () => {
   const { studyPlanId, selectedDay } = useParams();
   const [words, setWords] = useState([]);
@@ -26,10 +29,10 @@ const WordForest = () => {
     try {
       const [wordsRes, progressRes] = await Promise.all([
         axios.get(
-          `http://localhost:5000/get-words/${studyPlanId}/day/${selectedDay}`
+          `${server_base_url}/get-words/${studyPlanId}/day/${selectedDay}`
         ),
         axios.get(
-          `http://localhost:5000/get-learning-progress/${userData._id}/${studyPlanId}`
+          `${server_base_url}/get-learning-progress/${userData._id}/${studyPlanId}`
         ),
       ]);
 
@@ -54,7 +57,7 @@ const WordForest = () => {
 
     try {
       await axios.put(
-        `http://localhost:5000/update-learning-progress/${userData._id}/${studyPlanId}/day/${selectedDay}/${selectedWord._id}`,
+        `${server_base_url}/update-learning-progress/${userData._id}/${studyPlanId}/day/${selectedDay}/${selectedWord._id}`,
         {
           status: "learned",
           learned_on: new Date(),

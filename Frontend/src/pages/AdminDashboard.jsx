@@ -11,6 +11,9 @@ import {
 
 import "../css/AdminDashboard.css";
 
+const server_base_url = "https://gre-vocabulary-preparation-guide-server.onrender.com"
+
+
 import { useState } from "react";
 import OverlayView from "../components/OverlayView";
 import axios from "axios";
@@ -28,7 +31,7 @@ const AdminDashboard = () => {
       badges: "/admin/badges",
     };
 
-    const res = await axios.get(`http://localhost:5000${endpointMap[type]}`);
+    const res = await axios.get(`${server_base_url}${endpointMap[type]}`);
     setModalData(res.data);
     setModalTitle(type.replace("-", " ").toUpperCase());
   };
