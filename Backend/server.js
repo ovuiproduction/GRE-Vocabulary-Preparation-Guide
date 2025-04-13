@@ -39,10 +39,13 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-mongoose
-  .connect("mongodb://localhost:27017/gredb")
-  .then(() => console.log("Connected to database"))
-  .catch((err) => console.error("Database connection error:", err));
+const database_url = process.env.DB_URL;
+
+mongoose.connect(database_url, {
+  ssl: true
+})
+.then(() => console.log('MongoDB connected'))
+.catch(err => console.error('MongoDB connection error:', err));
 
 app.get("/", (req, res) => {
   res.send("This is server");
