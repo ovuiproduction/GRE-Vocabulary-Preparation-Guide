@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-const server_base_url = process.env.SERVER_URL;
+const server_base_url = process.env.REACT_APP_SERVER_URL;
 
 
 export default function Signup({ setIsLogin }) {
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");

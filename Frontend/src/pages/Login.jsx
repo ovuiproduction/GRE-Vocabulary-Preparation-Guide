@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "../css/auth.css";
 
-const server_base_url = process.env.SERVER_URL;
-
+const server_base_url = process.env.REACT_APP_SERVER_URL;
 
 export default function Login({setIsLogin}) {
   const [email, setEmail] = useState("");

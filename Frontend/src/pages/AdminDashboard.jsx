@@ -11,7 +11,7 @@ import {
 
 import "../css/AdminDashboard.css";
 
-const server_base_url = process.env.SERVER_URL;
+const server_base_url = process.env.REACT_APP_SERVER_URL;
 
 
 import { useState } from "react";
