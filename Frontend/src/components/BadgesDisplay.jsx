@@ -4,7 +4,7 @@ import { FiAward, FiX, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { Link } from "react-router";
 import "../css/BadgesDisplay.css";
 
-const server_base_url = "https://gre-vocabulary-preparation-guide-server.onrender.com"
+const server_base_url = process.env.SERVER_URL;
 
 const BadgesDisplay = () => {
   const [badges, setBadges] = useState([]);

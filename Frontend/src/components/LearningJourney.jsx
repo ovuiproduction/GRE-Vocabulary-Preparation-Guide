@@ -6,7 +6,7 @@ import { Link } from "react-router";
 
 import ProgressLineChart from "./ProgressLineChart";
 
-const server_base_url = "https://gre-vocabulary-preparation-guide-server.onrender.com"
+const server_base_url = process.env.SERVER_URL;
 
 
 const LearningJourney = () => {

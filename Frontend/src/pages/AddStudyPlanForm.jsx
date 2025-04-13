@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import "../css/study_plan.css";
 
-const server_base_url = "https://gre-vocabulary-preparation-guide-server.onrender.com"
+const server_base_url = process.env.SERVER_URL;
 
 
 const AddStudyPlanForm = () => {
@@ -65,9 +65,6 @@ const AddStudyPlanForm = () => {
       setError(err.response?.data?.message || 'Creation failed');
     }
   };
-
-  // if (loading) return <div>Loading words...</div>;
-  // if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="admin-form">

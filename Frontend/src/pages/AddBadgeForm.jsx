@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import "../css/AddBadgeForm.css";
 
-const server_base_url = "https://gre-vocabulary-preparation-guide-server.onrender.com"
+const server_base_url = process.env.SERVER_URL;
 
 
 const AddBadgeForm = () => {

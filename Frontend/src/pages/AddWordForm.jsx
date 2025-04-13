@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 import "../css/addwordform.css";
 
-const server_base_url = "https://gre-vocabulary-preparation-guide-server.onrender.com"
+const server_base_url = process.env.SERVER_URL;
 
 
 const AddWordForm = () => {

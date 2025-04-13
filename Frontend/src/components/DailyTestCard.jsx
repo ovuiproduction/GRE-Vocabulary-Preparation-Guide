@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const server_base_url = "https://gre-vocabulary-preparation-guide-server.onrender.com"
+const server_base_url = process.env.SERVER_URL;
 
 const DailyTestCard = ({ userData,selectedDay,studyPlanId }) => {
   const [testStatus, setTestStatus] = useState("loading"); // loading, not-attempted, attempted
