@@ -12,7 +12,7 @@ const server_base_url = process.env.REACT_APP_SERVER_URL;
 const LearningJourney = () => {
   const [progressData, setProgressData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentDay, setCurrentDay] = useState(1);
   const [userData, setUserData] = useState(null);
