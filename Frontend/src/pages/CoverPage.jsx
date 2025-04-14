@@ -85,9 +85,7 @@ export default function CoverPage() {
         </div>
       </section>
       <footer className="cover-page-footer">
-        <a href="/admin" target="_blank">
-          Admin Panel
-        </a>
+        <Link  to="/admin"> Admin Panel</Link>
       </footer>
     </div>
   );
