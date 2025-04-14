@@ -45,7 +45,7 @@ const DailyTestCard = ({ userData,selectedDay,studyPlanId }) => {
 
  const handleDailyTest = () => {
     if (studyPlanId && selectedDay) {
-      window.open(`/daily-test/${studyPlanId}/day/${selectedDay}`);
+      window.open(`#/daily-test/${studyPlanId}/day/${selectedDay}`);
     }
   };
 

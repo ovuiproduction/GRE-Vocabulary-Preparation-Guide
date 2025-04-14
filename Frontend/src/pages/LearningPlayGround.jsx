@@ -19,7 +19,7 @@ const LearningPlayground = () => {
 
   const handleWordForest = () => {
     if (studyPlanId && selectedDay) {
-      window.open(`/study-plan/${studyPlanId}/day/${selectedDay}`);
+      window.open(`#/study-plan/${studyPlanId}/day/${selectedDay}`);
     }
   };
 

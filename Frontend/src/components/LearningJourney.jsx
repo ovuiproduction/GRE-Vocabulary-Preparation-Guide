@@ -137,8 +137,7 @@ const LearningJourney = () => {
 
  
   useEffect(() => {
-    if (!userData || !studyPlan) return;
-
+   
     const fetchProgressData = async () => {
       try {
         setLoading(true);
@@ -229,8 +228,9 @@ const LearningJourney = () => {
         setLoading(false);
       }
     };
-
-    fetchProgressData();
+    if(userData && userData.study_plan){
+      fetchProgressData();
+    }
   }, [userData, studyPlan, currentDay]);
 
   if (loading) {

@@ -103,7 +103,7 @@ export default function Home() {
           localStorage.setItem("user", JSON.stringify(updatedUser));
           setUserData(updatedUser);
 
-          window.open(`/study-plan/${userData.study_plan}`, "_blank");
+          window.open(`#/study-plan/${userData.study_plan}`, "_blank");
         } else {
           alert(data.error || "Failed to start learning");
         }
@@ -113,7 +113,7 @@ export default function Home() {
       }
     } else {
       // Already started, directly navigate
-      window.open(`/study-plan/${userData.study_plan}`, "_blank");
+      window.open(`#/study-plan/${userData.study_plan}`, "_blank");
     }
   };
 
@@ -180,7 +180,7 @@ export default function Home() {
   };
 
   const handleNavigateProgress = () => {
-    window.open("/learning-journey" , "_blank");
+    window.open("#/learning-journey" , "_blank");
   };
 
   const handleNavigateBadges = () => {
