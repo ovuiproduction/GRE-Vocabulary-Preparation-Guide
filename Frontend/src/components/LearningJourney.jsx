@@ -342,7 +342,7 @@ const LearningJourney = () => {
       </div>
 
       {progressData.length == 0 ? (
-        <div className="learning-journey-container">
+        <div className="learning-journey-container-notice">
           No progress data available.
         </div>
       ) : (

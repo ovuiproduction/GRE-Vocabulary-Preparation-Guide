@@ -494,3 +494,11 @@
 .route-paths a:hover {
   color: #4338ca; /* Tailwind Indigo-700 */
 }
+
+.learning-journey-container-notice{
+  width:100%;
+  min-height:30vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
