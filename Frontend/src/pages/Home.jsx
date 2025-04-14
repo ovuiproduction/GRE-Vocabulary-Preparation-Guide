@@ -180,7 +180,7 @@ export default function Home() {
   };
 
   const handleNavigateProgress = () => {
-    window.open("/learning-journey");
+    window.open("/learning-journey" , "_blank");
   };
 
   const handleNavigateBadges = () => {
