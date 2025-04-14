@@ -8,7 +8,6 @@ import ProgressLineChart from "./ProgressLineChart";
 
 const server_base_url = process.env.REACT_APP_SERVER_URL;
 
-
 const LearningJourney = () => {
   const [progressData, setProgressData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -135,9 +134,7 @@ const LearningJourney = () => {
     fetchUserAndPlan();
   }, []);
 
- 
   useEffect(() => {
-   
     const fetchProgressData = async () => {
       try {
         setLoading(true);
@@ -228,7 +225,7 @@ const LearningJourney = () => {
         setLoading(false);
       }
     };
-    if(userData && userData.study_plan){
+    if (userData && userData.study_plan) {
       fetchProgressData();
     }
   }, [userData, studyPlan, currentDay]);
@@ -250,13 +247,13 @@ const LearningJourney = () => {
     );
   }
 
-  if (progressData.length === 0) {
-    return (
-      <div className="learning-journey-container">
-        No progress data available.
-      </div>
-    );
-  }
+  // if (progressData.length === 0) {
+  //   return (
+  //     <div className="learning-journey-container">
+  //       No progress data available.
+  //     </div>
+  //   );
+  // }
 
   const calculateCircleProgress = (wordsLearned) => {
     const radius = 30;
@@ -309,7 +306,9 @@ const LearningJourney = () => {
 
       <div className="learning-journey-routes">
         <p className="route-paths">
-          <span><Link to="/home">Home</Link></span>
+          <span>
+            <Link to="/home">Home</Link>
+          </span>
           <span>/</span>
           <span>LearningJourney</span>
         </p>
@@ -342,116 +341,126 @@ const LearningJourney = () => {
         )}
       </div>
 
-    
-
-      {/* Main Content */}
-      <main className="journey-content">
-        {filteredData.length === 0 ? (
-          <div className="no-results">
-            No days match your search. Try a different day or range.
-          </div>
-        ) : (
-          <>
-            <div className="day-cards-grid">
-              {filteredData.map((dayData) => {
-                const circleProgress = calculateCircleProgress(
-                  dayData.wordsLearned
-                );
-                const isCurrentDay = dayData.day === currentDay;
-
-                return (
-                  <div
-                    key={dayData.day}
-                    className={`day-card ${isCurrentDay ? "current-day" : ""} ${
-                      dayData.backlog ? "backlog" : ""
-                    }`}
-                    // onClick={() => setCurrentDay(dayData.day)}
-                  >
-                    <div className="day-card-header">
-                      <h3 className="day-number">Day {dayData.day}</h3>
-                      {dayData.backlog && (
-                        <span className="backlog-tag">Behind</span>
-                      )}
-                      {isCurrentDay && (
-                        <span className="current-tag">Today</span>
-                      )}
-                    </div>
-
-                    <div className="progress-indicator">
-                      <svg className="progress-circle" viewBox="0 0 70 70">
-                        <circle
-                          className="progress-circle-bg"
-                          cx="35"
-                          cy="35"
-                          r="30"
-                        />
-                        <circle
-                          className={`progress-circle-fill ${
-                            dayData.backlog ? "backlog-fill" : ""
-                          }`}
-                          cx="35"
-                          cy="35"
-                          r="30"
-                          strokeDasharray={circleProgress.circumference}
-                          strokeDashoffset={circleProgress.dashOffset}
-                        />
-                      </svg>
-                      <div className="progress-percent">
-                        {circleProgress.progressPercent}%
-                      </div>
-                    </div>
-
-                    <div className="day-stats">
-                      <div className="words-stat">
-                        <span className="stat-value">
-                          {dayData.wordsLearned}
-                        </span>
-                        <span className="stat-label">/20 words</span>
-                      </div>
-
-                      <div
-                        className={`test-stat ${
-                          !dayData.testExists
-                            ? "no-test"
-                            : dayData.testStatus === "attempted"
-                            ? "completed"
-                            : "pending"
-                        }`}
-                      >
-                        {dayData.testExists ? (
-                          dayData.testStatus === "attempted" ? (
-                            <>
-                              <span className="score">{dayData.score}%</span>
-                              <span className="label">Test score</span>
-                            </>
-                          ) : (
-                            <>
-                              <span className="icon">📝</span>
-                              <span className="label">Pending</span>
-                            </>
-                          )
-                        ) : (
-                          <>
-                            <span className="icon">—</span>
-                            <span className="label">No test</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </>
-        )}
-      </main>
-      {progressData && (
+      {progressData.length == 0 ? (
+        <div className="learning-journey-container">
+          No progress data available.
+        </div>
+      ) : (
         <>
-          <h2 className="learning-journey-progress-graph-title">Words Learned</h2>
-          <main className="progress-graph">
-            {<ProgressLineChart progressData={progressData} />}
+          {/* Main Content */}
+          <main className="journey-content">
+            {filteredData.length === 0 ? (
+              <div className="no-results">
+                No days match your search. Try a different day or range.
+              </div>
+            ) : (
+              <>
+                <div className="day-cards-grid">
+                  {filteredData.map((dayData) => {
+                    const circleProgress = calculateCircleProgress(
+                      dayData.wordsLearned
+                    );
+                    const isCurrentDay = dayData.day === currentDay;
+
+                    return (
+                      <div
+                        key={dayData.day}
+                        className={`day-card ${
+                          isCurrentDay ? "current-day" : ""
+                        } ${dayData.backlog ? "backlog" : ""}`}
+                        // onClick={() => setCurrentDay(dayData.day)}
+                      >
+                        <div className="day-card-header">
+                          <h3 className="day-number">Day {dayData.day}</h3>
+                          {dayData.backlog && (
+                            <span className="backlog-tag">Behind</span>
+                          )}
+                          {isCurrentDay && (
+                            <span className="current-tag">Today</span>
+                          )}
+                        </div>
+
+                        <div className="progress-indicator">
+                          <svg className="progress-circle" viewBox="0 0 70 70">
+                            <circle
+                              className="progress-circle-bg"
+                              cx="35"
+                              cy="35"
+                              r="30"
+                            />
+                            <circle
+                              className={`progress-circle-fill ${
+                                dayData.backlog ? "backlog-fill" : ""
+                              }`}
+                              cx="35"
+                              cy="35"
+                              r="30"
+                              strokeDasharray={circleProgress.circumference}
+                              strokeDashoffset={circleProgress.dashOffset}
+                            />
+                          </svg>
+                          <div className="progress-percent">
+                            {circleProgress.progressPercent}%
+                          </div>
+                        </div>
+
+                        <div className="day-stats">
+                          <div className="words-stat">
+                            <span className="stat-value">
+                              {dayData.wordsLearned}
+                            </span>
+                            <span className="stat-label">/20 words</span>
+                          </div>
+
+                          <div
+                            className={`test-stat ${
+                              !dayData.testExists
+                                ? "no-test"
+                                : dayData.testStatus === "attempted"
+                                ? "completed"
+                                : "pending"
+                            }`}
+                          >
+                            {dayData.testExists ? (
+                              dayData.testStatus === "attempted" ? (
+                                <>
+                                  <span className="score">
+                                    {dayData.score}%
+                                  </span>
+                                  <span className="label">Test score</span>
+                                </>
+                              ) : (
+                                <>
+                                  <span className="icon">📝</span>
+                                  <span className="label">Pending</span>
+                                </>
+                              )
+                            ) : (
+                              <>
+                                <span className="icon">—</span>
+                                <span className="label">No test</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
           </main>
-          </>
+          {progressData && (
+            <>
+              <h2 className="learning-journey-progress-graph-title">
+                Words Learned
+              </h2>
+              <main className="progress-graph">
+                {<ProgressLineChart progressData={progressData} />}
+              </main>
+            </>
+          )}
+        </>
       )}
       <footer className="learning-journey-footer">Learn & Grow</footer>
     </div>
