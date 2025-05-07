@@ -41,11 +41,15 @@ const upload = multer({ storage });
 
 const database_url = process.env.DB_URL;
 
-mongoose.connect(database_url, {
-  ssl: true
-})
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.error('MongoDB connection error:', err));
+// mongoose.connect(database_url, {
+//   ssl: true
+// })
+// .then(() => console.log('MongoDB connected'))
+// .catch(err => console.error('MongoDB connection error:', err));
+
+mongoose.connect(database_url).then(()=>{
+  console.log('MongoDB connected');
+});
 
 app.get("/", (req, res) => {
   res.send("This is server");
@@ -535,9 +539,102 @@ app.get("/word-stats/:userId/:studyPlanId/:day", async (req, res) => {
   });
 });
 
+
+
+
+
+// app.put("/update-streak/:userId/:studyPlanId", async (req, res) => {
+//   const { userId, studyPlanId } = req.params;
+
+//   try {
+//     const user = await users.findById(userId);
+//     if (!user || !user.startDate) {
+//       return res.status(400).json({ error: "User or startDate not found" });
+//     }
+
+//     const plan = await StudyPlan.findById(studyPlanId);
+//     if (!plan) {
+//       return res.status(404).json({ error: "Study plan not found" });
+//     }
+
+//     const startDate = new Date(user.startDate);
+//     const today = new Date();
+
+//     startDate.setHours(0, 0, 0, 0);
+//     today.setHours(0, 0, 0, 0);
+
+//     const timeDiff = today.getTime() - startDate.getTime();
+//     const daysSinceStart = Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
+
+//     totalDays = Math.max(
+//       1,
+//       Math.min(daysSinceStart, plan.duration_days)
+//     );
+
+//     let currentStreak = 0;
+//     const completedDays = [];
+
+//     for (let day = 1; day <= totalDays; day++) {
+//       const progress = await DayWiseProgress.findOne({
+//         user_id: userId,
+//         studyPlanId,
+//         dayIndex: day,
+//       });
+
+//       if (!progress) break;
+
+//       const assignedWordsDocs = await Word.find({
+//         [`dayIndex.${studyPlanId}`]: day,
+//       }).select("_id");
+
+//       const assignedWordIds = assignedWordsDocs.map((w) => w._id.toString());
+//       const completed = (progress.completedWords || []).map((id) =>
+//         id.toString()
+//       );
+
+//       const allCompleted = assignedWordIds.every((wordId) =>
+//         completed.includes(wordId)
+//       );
+
+//       if (!allCompleted) break;
+
+//       currentStreak++;
+//       completedDays.push(day);
+//     }
+
+//     // Update user streak
+//     user.streak = currentStreak;
+//     await user.save();
+
+//     // Update or create StreakTracker
+//     const updatedTracker = await StreakTracker.findOneAndUpdate(
+//       { user_id: userId, studyPlanId },
+//       {
+//         $set: {
+//           currentStreak,
+//           lastCheckedDate: today,
+//         },
+//         $addToSet: {
+//           completedDays: { $each: completedDays },
+//         },
+//       },
+//       { upsert: true, new: true }
+//     );
+
+//     res.json({
+//       message: "Streak updated",
+//       streak: currentStreak,
+//       streakTracker: updatedTracker,
+//     });
+//   } catch (error) {
+//     console.error("Error updating streak:", error);
+//     res.status(500).json({ error: "Failed to update streak" });
+//   }
+// });
+
 app.put("/update-streak/:userId/:studyPlanId", async (req, res) => {
   const { userId, studyPlanId } = req.params;
-
+  console.log("Update Streak");
   try {
     const user = await users.findById(userId);
     if (!user || !user.startDate) {
@@ -558,10 +655,7 @@ app.put("/update-streak/:userId/:studyPlanId", async (req, res) => {
     const timeDiff = today.getTime() - startDate.getTime();
     const daysSinceStart = Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
 
-    totalDays = Math.max(
-      1,
-      Math.min(daysSinceStart, plan.duration_days)
-    );
+    const totalDays = Math.max(1, Math.min(daysSinceStart, plan.duration_days));
 
     let currentStreak = 0;
     const completedDays = [];
@@ -573,7 +667,10 @@ app.put("/update-streak/:userId/:studyPlanId", async (req, res) => {
         dayIndex: day,
       });
 
-      if (!progress) break;
+      if (!progress) {
+        currentStreak = 0;
+        break;
+      }
 
       const assignedWordsDocs = await Word.find({
         [`dayIndex.${studyPlanId}`]: day,
@@ -588,7 +685,10 @@ app.put("/update-streak/:userId/:studyPlanId", async (req, res) => {
         completed.includes(wordId)
       );
 
-      if (!allCompleted) break;
+      if (!allCompleted) {
+        currentStreak = 0;
+        break;
+      }
 
       currentStreak++;
       completedDays.push(day);
@@ -601,15 +701,23 @@ app.put("/update-streak/:userId/:studyPlanId", async (req, res) => {
     // Update or create StreakTracker
     const updatedTracker = await StreakTracker.findOneAndUpdate(
       { user_id: userId, studyPlanId },
-      {
-        $set: {
-          currentStreak,
-          lastCheckedDate: today,
-        },
-        $addToSet: {
-          completedDays: { $each: completedDays },
-        },
-      },
+      currentStreak === 0
+        ? {
+            $set: {
+              currentStreak: 0,
+              lastCheckedDate: today,
+              completedDays: [],
+            },
+          }
+        : {
+            $set: {
+              currentStreak,
+              lastCheckedDate: today,
+            },
+            $addToSet: {
+              completedDays: { $each: completedDays },
+            },
+          },
       { upsert: true, new: true }
     );
 
@@ -623,6 +731,10 @@ app.put("/update-streak/:userId/:studyPlanId", async (req, res) => {
     res.status(500).json({ error: "Failed to update streak" });
   }
 });
+
+
+
+
 
 app.get("/test-track-status", async (req, res) => {
   const { userId, studyPlanId, testId } = req.query;
@@ -670,13 +782,15 @@ app.get("/all-word-stats/:userId/:studyPlanId", async (req, res) => {
       [`dayIndex.${studyPlanId}`]: { $exists: true },
     }).select("dayIndex");
 
+  
     // Aggregate word counts by day
     const wordMap = {};
     for (const doc of wordDocs) {
-      const day = doc.dayIndex[studyPlanId];
+      const day = doc.dayIndex.get(studyPlanId);
       wordMap[day] = (wordMap[day] || 0) + 1;
     }
 
+   
     // Build response for all days (up to max available day)
     const allDays = new Set([
       ...Object.keys(progressMap),
@@ -704,11 +818,9 @@ app.get("/all-word-stats/:userId/:studyPlanId", async (req, res) => {
 
 app.get("/all-test-progress/:userId/:studyPlanId", async (req, res) => {
   const { userId, studyPlanId } = req.params;
-
   try {
     // Fetch all tests for this study plan
-    const testDocs = await Test.find({ studyPlan: studyPlanId });
-
+    const testDocs = await Test.find({ studyPlanId: studyPlanId });
     // Extract test IDs
     const testIds = testDocs.map((t) => t._id.toString());
 
@@ -724,7 +836,7 @@ app.get("/all-test-progress/:userId/:studyPlanId", async (req, res) => {
     for (const track of trackDocs) {
       trackMap[track.test_id.toString()] = {
         attempted: true,
-        score: track.score,
+        score: track.total_questions==0 ? 0 : (track.score /  track.total_questions)*100,
         correct_answers: track.correct_answers,
         total_questions: track.total_questions,
         attempted_at: track.attempted_at,
@@ -750,7 +862,6 @@ app.get("/all-test-progress/:userId/:studyPlanId", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch all test progress" });
   }
 });
-
 
 app.get("/get/badges",async(req,res)=>{
   const badges = await Badge.find({

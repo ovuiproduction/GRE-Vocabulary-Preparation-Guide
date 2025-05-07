@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState} from "react";
 import { Link } from "react-router";
 import "../css/CoverPage.css";
 import { FaCheck, FaGamepad, FaBrain, FaClipboardCheck } from "react-icons/fa";
@@ -9,6 +9,7 @@ const { AuthComponentUser } = AuthComponents;
 export default function CoverPage() {
   const [showAuthUser, setShowAuthUser] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
+
   const [featureCards] = useState([
     {
       title: "Gamified Learning",
@@ -44,7 +45,7 @@ export default function CoverPage() {
 
   return (
     <div className="coverpage-container">
-      {showAuthUser && <AuthComponentUser onClose={() => setShowAuth(false)} />}
+      {showAuthUser && <AuthComponentUser onClose={() => setShowAuthUser(false)} />}
       {showHelpModal && <HelpModal onClose={() => setShowHelpModal(false)} />}
       <div className="coverpage-particles-container"></div>
       <section className="coverpage-hero-section">

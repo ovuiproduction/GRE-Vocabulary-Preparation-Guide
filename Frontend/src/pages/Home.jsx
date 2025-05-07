@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import {
   FaBook,
   FaChartLine,
@@ -26,55 +27,135 @@ export default function Home() {
 
   const navigate = useNavigate();
 
+  const location = useLocation();
+  const user = location.state?.user;
+
+  // useEffect(() => {
+  //   const updateStreak = async () => {
+  //     if (!user) return;
+  //     try {
+  //       await axios.put(
+  //         `http://localhost:5000/update-streak/${user._id}/${user.study_plan}`
+  //       );
+  //     } catch (error) {
+  //       console.error("Error updating streak:", error);
+  //     }
+  //   };
+  //   updateStreak();
+  // }, [user]);
+  
+
+  // useEffect(() => {
+
+  //   const fetchUser = async () => {
+  //     const storedUser = localStorage.getItem("user");
+  //     if (storedUser) {
+  //       const user = JSON.parse(storedUser);
+  //       setUserData(user);
+  //       try {
+  //         const res = await axios.get(`${server_base_url}/user/${user._id}`);
+  //         let userRes = res.data;
+  //         if (res.data) {
+  //           setUserData(res.data);
+  //           localStorage.setItem("user", JSON.stringify(res.data));
+  //           let calculatedDay = 1;
+  //           if (userRes.startDate) {
+  //             const startDate = new Date(userRes.startDate);
+  //             const today = new Date();
+
+  //             startDate.setHours(0, 0, 0, 0);
+  //             today.setHours(0, 0, 0, 0);
+
+  //             const timeDiff = today.getTime() - startDate.getTime();
+  //             const daysSinceStart =
+  //               Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
+
+  //             calculatedDay = Math.max(
+  //               1,
+  //               Math.min(daysSinceStart, userRes.studyPlanDuration || 30)
+  //             );
+  //           }
+  //           setCurrentDay(calculatedDay);
+  //         }
+  //       } catch (err) {
+  //         console.error("Failed to fetch updated user data", err);
+  //       }
+  //     }
+  //   };
+
+  //   fetchUser();
+
+  //   const handleFocus = () => {
+  //     fetchUser();
+  //   };
+
+  //   window.addEventListener("focus", handleFocus);
+
+  //   return () => {
+  //     window.removeEventListener("focus", handleFocus);
+  //   };
+  // }, []);
+
+
   useEffect(() => {
     const fetchUser = async () => {
-      const storedUser = localStorage.getItem("user");
-      if (storedUser) {
-        const user = JSON.parse(storedUser);
-        setUserData(user);
-        try {
-          const res = await axios.get(`${server_base_url}/user/${user._id}`);
-          let userRes = res.data;
-          if (res.data) {
-            setUserData(res.data);
-            localStorage.setItem("user", JSON.stringify(res.data));
-            let calculatedDay = 1;
-            if (userRes.startDate) {
-              const startDate = new Date(userRes.startDate);
-              const today = new Date();
-
-              startDate.setHours(0, 0, 0, 0);
-              today.setHours(0, 0, 0, 0);
-
-              const timeDiff = today.getTime() - startDate.getTime();
-              const daysSinceStart =
-                Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
-
-              calculatedDay = Math.max(
-                1,
-                Math.min(daysSinceStart, userRes.studyPlanDuration || 30)
-              );
-            }
-            setCurrentDay(calculatedDay);
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (!storedUser) return;
+  
+        const parsedUser = JSON.parse(storedUser);
+        setUserData(parsedUser);
+  
+        // 1. Update streak
+        await axios.put(
+          `http://localhost:5000/update-streak/${parsedUser._id}/${parsedUser.study_plan}`
+        );
+  
+        // 2. Fetch updated user data
+        const res = await axios.get(`${server_base_url}/user/${parsedUser._id}`);
+        const userRes = res.data;
+  
+        if (userRes) {
+          setUserData(userRes);
+          localStorage.setItem("user", JSON.stringify(userRes));
+  
+          // 3. Calculate current day
+          let calculatedDay = 1;
+          if (userRes.startDate) {
+            const startDate = new Date(userRes.startDate);
+            const today = new Date();
+            startDate.setHours(0, 0, 0, 0);
+            today.setHours(0, 0, 0, 0);
+  
+            const timeDiff = today.getTime() - startDate.getTime();
+            const daysSinceStart = Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
+            calculatedDay = Math.max(
+              1,
+              Math.min(daysSinceStart, userRes.studyPlanDuration || 30)
+            );
           }
-        } catch (err) {
-          console.error("Failed to fetch updated user data", err);
+  
+          setCurrentDay(calculatedDay);
         }
+      } catch (error) {
+        console.error("Error during streak update or user fetch:", error);
       }
     };
-
+  
     fetchUser();
-
+  
+    // Refresh user data on window focus
     const handleFocus = () => {
       fetchUser();
     };
-
+  
     window.addEventListener("focus", handleFocus);
-
     return () => {
       window.removeEventListener("focus", handleFocus);
     };
   }, []);
+  
+
 
   const handleStartLearning = async () => {
     if (!userData.study_plan) {

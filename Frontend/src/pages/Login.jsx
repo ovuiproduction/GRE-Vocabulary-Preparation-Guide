@@ -4,7 +4,7 @@ import "../css/auth.css";
 
 const server_base_url = process.env.REACT_APP_SERVER_URL;
 
-export default function Login({setIsLogin}) {
+export default function Login({setIsLogin,onClose}) {
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState(1); // Step 1: Enter Email, Step 2: Enter OTP
@@ -61,7 +61,7 @@ export default function Login({setIsLogin}) {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      navigate("/home");
+      navigate("/home",{state:{user:data.user}});
     } catch (err) {
       setError(err.message);
     } finally {
@@ -73,6 +73,7 @@ export default function Login({setIsLogin}) {
     <div className="auth-root">
     <div className="authContainer">
       <h2>Login</h2>
+      <button className="auth-close-btn" onClick={onClose}>✖</button>
       {error && <p className="error">{error}</p>}
 
       {step === 1 && (
@@ -88,7 +89,7 @@ export default function Login({setIsLogin}) {
               required
             />
           </div>
-          <button type="submit" disabled={loading}>
+          <button className="submit-button" type="submit" disabled={loading}>
             {loading ? "Checking..." : "Next"}
           </button>
         </form>
@@ -107,7 +108,7 @@ export default function Login({setIsLogin}) {
               required
             />
           </div>
-          <button type="submit" disabled={loading}>
+          <button className="submit-button" type="submit" disabled={loading}>
             {loading ? "Verifying..." : "Verify & Login"}
           </button>
         </form>

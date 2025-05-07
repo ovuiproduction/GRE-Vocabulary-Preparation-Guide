@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 const server_base_url = process.env.REACT_APP_SERVER_URL;
 
 
-export default function Signup({ setIsLogin }) {
+export default function Signup({ setIsLogin ,onClose}) {
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -41,6 +41,7 @@ export default function Signup({ setIsLogin }) {
     <div className="auth-root">
       <div className="authContainer">
         <h2>Sign Up</h2>
+        <button className="auth-close-btn" onClick={onClose}>✖</button>
         {error && <p className="error">{error}</p>}
         <form onSubmit={handleSignup}>
           <>
@@ -80,7 +81,7 @@ export default function Signup({ setIsLogin }) {
               />
             </div>
           </>
-          <button type="submit">Submit</button>
+          <button className="submit-button" type="submit">Submit</button>
         </form>
         <p>
           Already have an account?{" "}

@@ -138,7 +138,10 @@ const LearningJourney = () => {
     const fetchProgressData = async () => {
       try {
         setLoading(true);
-        const days = studyPlan.duration_days || 30;
+        let days = 30;
+        if (studyPlan) {
+          days = studyPlan.duration_days;
+        }
 
         // Fetch all word stats in one go
         const wordStatsRes = await axios.get(
@@ -170,7 +173,7 @@ const LearningJourney = () => {
         let wordsTotal = 0;
         let testsCompleted = 0;
 
-        for (let day = 1; day <= days; day++) {
+        for (let day = 1; day <= currentDay; day++) {
           const wordStat = wordStatsMap[day] || { learned: 0, totalWords: 0 };
           const testStat = testMap[day] || {
             testExists: false,
@@ -178,15 +181,14 @@ const LearningJourney = () => {
             score: 0,
           };
 
-          const backlog = wordStat.learned < 10 && day < currentDay;
-
-          if (!wordStatsMap[day] && !testMap[day]) continue;
+          const backlog = wordStat.learned < wordStat.totalWords && day < currentDay;
 
           if (testStat.attempted) testsCompleted++;
           wordsTotal += wordStat.learned;
 
           progress.push({
             day,
+            totalWords: wordStat.totalWords,
             wordsLearned: wordStat.learned,
             testStatus: testStat.attempted ? "attempted" : "not-attempted",
             testExists: testStat.testExists,
@@ -194,6 +196,8 @@ const LearningJourney = () => {
             backlog,
           });
         }
+        console.log(currentDay);
+        console.log(progress);
 
         setTotalWords(wordsTotal);
         setCompletedTests(testsCompleted);
@@ -247,18 +251,22 @@ const LearningJourney = () => {
     );
   }
 
-  // if (progressData.length === 0) {
-  //   return (
-  //     <div className="learning-journey-container">
-  //       No progress data available.
-  //     </div>
-  //   );
-  // }
-
-  const calculateCircleProgress = (wordsLearned) => {
+  const calculateCircleProgress = (dayWords) => {
     const radius = 30;
     const circumference = 2 * Math.PI * radius;
-    const progress = Math.min(wordsLearned / studyPlan.daily_new_words, 1);
+    console.log(dayWords);
+    const learned = Number(dayWords.wordsLearned) || 0;
+    const total = Number(dayWords.totalWords) || 0;
+    console.log("total",total)
+
+    let progress = 0;
+
+    if (total > 0) {
+      progress = Math.min(learned / total, 1);
+    }
+
+    console.log(progress);
+
     const dashOffset = circumference * (1 - progress);
 
     return {
@@ -357,9 +365,7 @@ const LearningJourney = () => {
               <>
                 <div className="day-cards-grid">
                   {filteredData.map((dayData) => {
-                    const circleProgress = calculateCircleProgress(
-                      dayData.wordsLearned
-                    );
+                    const circleProgress = calculateCircleProgress(dayData);
                     const isCurrentDay = dayData.day === currentDay;
 
                     return (

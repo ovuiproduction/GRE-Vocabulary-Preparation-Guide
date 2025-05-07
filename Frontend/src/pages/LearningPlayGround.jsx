@@ -17,6 +17,8 @@ const LearningPlayground = () => {
   const [remainingWords, setRemainingWords] = useState();
   const [totalWords, setTotalWords] = useState();
 
+  const [currentDay,setCurrentDay] = useState();
+
   const handleWordForest = () => {
     if (studyPlanId && selectedDay) {
       window.open(`#/study-plan/${studyPlanId}/day/${selectedDay}`);
@@ -57,6 +59,7 @@ const LearningPlayground = () => {
               );
             }
             setSelectedDay(calculatedDay);
+            setCurrentDay(calculatedDay);
           }
         } catch (err) {
           console.error("Failed to fetch updated user data", err);
@@ -179,7 +182,9 @@ const LearningPlayground = () => {
         <main className="learning-playground-content">
           <div className="learning-playground-content-header">
             <h2 className="learning-playground-day-title">Day {selectedDay}</h2>
-            <span className="learning-playground-word-count">Todays Plan</span>
+            <span className="learning-playground-word-count">
+              {currentDay==selectedDay ? <>Todays Plan</>:<></>}
+              </span>
           </div>
 
           <div className="learning-playground-word-list">
