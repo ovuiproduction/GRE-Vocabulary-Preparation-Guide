@@ -14,6 +14,8 @@ import { useNavigate } from "react-router-dom";
 
 import "../css/home.css";
 
+import Chatbot from "../components/Chatbot";
+
 const server_base_url = process.env.REACT_APP_SERVER_URL;
 
 
@@ -276,6 +278,8 @@ export default function Home() {
           <img src={logoImg} alt="GRE Master" className="home-logo" />
           <span className="home-logo-text">GRE Vocabulary Master</span>
         </div>
+
+        <Chatbot />
 
         <div className="home-profile-menu">
           <button

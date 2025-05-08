@@ -4,6 +4,7 @@ import axios from "axios";
 import "../css/WordForest.css";
 
 const server_base_url = process.env.REACT_APP_SERVER_URL;
+import Chatbot from "../components/Chatbot";
 
 
 const WordForest = () => {
@@ -101,6 +102,7 @@ const WordForest = () => {
 
   return (
     <div className="wordforest-container">
+      <Chatbot/>
       <header className="wordforest-header">
         <div className="wordforest-header-content">
           <h1 className="wordforest-header-title">

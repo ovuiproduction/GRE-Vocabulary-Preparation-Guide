@@ -7,6 +7,8 @@ import DailyTestCard from "../components/DailyTestCard";
 
 const server_base_url = process.env.REACT_APP_SERVER_URL;
 
+import Chatbot from "../components/Chatbot";
+
 
 const LearningPlayground = () => {
   const { studyPlanId } = useParams();
@@ -117,6 +119,7 @@ const LearningPlayground = () => {
   return (
     <div className="learning-playground-container">
       {/* Header */}
+      <Chatbot/>
       <header className="learning-playground-header">
         <div className="learning-playground-header-content">
           <h1 className="learning-playground-header-title">

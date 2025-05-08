@@ -4,6 +4,8 @@ import { FiAward, FiX, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { Link } from "react-router";
 import "../css/BadgesDisplay.css";
 
+import Chatbot from "../components/Chatbot";
+
 const server_base_url = process.env.REACT_APP_SERVER_URL;
 
 const BadgesDisplay = () => {
@@ -93,6 +95,7 @@ const BadgesDisplay = () => {
 
   return (
     <div className="badges-container">
+      <Chatbot/>
       <header className="journey-header">
         <div className="header-content">
           <h1>My Achievements</h1>

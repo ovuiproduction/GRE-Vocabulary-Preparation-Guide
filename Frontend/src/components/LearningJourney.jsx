@@ -5,6 +5,8 @@ import "../css/LearningJourney.css";
 import { Link } from "react-router";
 
 import ProgressLineChart from "./ProgressLineChart";
+import Chatbot from "../components/Chatbot";
+
 
 const server_base_url = process.env.REACT_APP_SERVER_URL;
 
@@ -278,6 +280,7 @@ const LearningJourney = () => {
 
   return (
     <div className="learning-journey-container">
+      <Chatbot/>
       {/* Header Section */}
       <header className="journey-header">
         <div className="header-content">

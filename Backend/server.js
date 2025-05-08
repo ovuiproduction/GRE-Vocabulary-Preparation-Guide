@@ -634,7 +634,7 @@ app.get("/word-stats/:userId/:studyPlanId/:day", async (req, res) => {
 
 app.put("/update-streak/:userId/:studyPlanId", async (req, res) => {
   const { userId, studyPlanId } = req.params;
-  console.log("Update Streak");
+
   try {
     const user = await users.findById(userId);
     if (!user || !user.startDate) {
