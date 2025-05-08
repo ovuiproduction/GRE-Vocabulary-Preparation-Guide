@@ -733,9 +733,6 @@ app.put("/update-streak/:userId/:studyPlanId", async (req, res) => {
 });
 
 
-
-
-
 app.get("/test-track-status", async (req, res) => {
   const { userId, studyPlanId, testId } = req.query;
   try {
@@ -748,7 +745,7 @@ app.get("/test-track-status", async (req, res) => {
     if (track) {
       res.json({
         attempted: true,
-        score: track.score,
+        score: track.total_questions==0 ? 0 : (track.score /  track.total_questions)*100,
         correct_answers: track.correct_answers,
         total_questions: track.total_questions,
         attempted_at: track.attempted_at,

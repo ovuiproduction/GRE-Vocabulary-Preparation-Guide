@@ -434,7 +434,7 @@ const LearningJourney = () => {
                               dayData.testStatus === "attempted" ? (
                                 <>
                                   <span className="score">
-                                    {dayData.score}%
+                                    {dayData.score.toFixed(1)}%
                                   </span>
                                   <span className="label">Test score</span>
                                 </>

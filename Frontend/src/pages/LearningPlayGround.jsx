@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import "../css/LearningPlayground.css";
@@ -21,13 +22,17 @@ const LearningPlayground = () => {
 
   const [currentDay,setCurrentDay] = useState();
 
+  const navigate = useNavigate();
+
   const handleWordForest = () => {
     if (studyPlanId && selectedDay) {
       window.open(`#/study-plan/${studyPlanId}/day/${selectedDay}`);
     }
   };
 
-  const handleDailyPractice = () => {};
+  const handleDailyPractice = () => {
+    navigate(`/daily-practice/${studyPlanId}/day/${selectedDay}`);
+  };
 
   const [userData, setUserData] = useState(null);
 

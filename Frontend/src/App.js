@@ -10,6 +10,7 @@ import NotFound from './pages/NotFound';
 import LearningPlayground from "./pages/LearningPlayGround";
 import WordForest from './pages/WordForest';
 import TestPage from './pages/TestPage';
+import Practice from './components/Practice';
 
 
 import AdminDashboard from './pages/AdminDashboard';
@@ -45,6 +46,7 @@ function App() {
         <Route path="/study-plan/:studyPlanId/day/:selectedDay" element={<WordForest />} />
 
         <Route path="/daily-test/:studyPlanId/day/:selectedDay" element={<TestPage />} />
+        <Route path="/daily-practice/:studyPlanId/day/:selectedDay" element={<Practice />} />
 
         <Route path="/learning-journey" element={<LearningJourney />} />
 
